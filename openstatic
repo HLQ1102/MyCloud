@@ -1,0 +1,102 @@
+openstatic环境准备
+
+搭建dns服务器
+yum -y install bind bind-chroot
+vim /etc/named.conf
+  listen-on port 53 { 192.168.1.254; };
+  listen-on-v6 port 53 { ::1; };
+  allow-query     { any; };
+  recursion yes;
+  forwarders {114.114.114.114;};
+
+真机搭建件时间服务器
+yum -y install chrony
+vim /etc/chrony.conf
+  server ntp.aliyun.com iburst  //使用阿里云的时间服务器
+  bindacqaddres 0.0.0.0
+  allow 0/0
+chronyc sources -v  //验证时间服务器
+
+云计算
+基于互联网的相关服务的增加、使用和交付模式
+这种模式提供可用的便捷的、按需的网路访问，进入可配置的计算资源共享池
+
+
+
+IaaS云
+
+
+
+PaaS云
+（Platform-as-a-Service）平台即服务
+ - 以服务器平台或者开发环境作为服务进行提供就成为PaaS
+ - PaaS运营商所需提供的服务，不仅仅是单纯的基础平台，还针对该平台的技术支持服务，甚至针对该平台而进行的应用系统开发、优化等服务
+ - 简单的说，PaaS平台是指云环境中的应用基础设施服务，也可以说是中间件即服务
+
+SaaS云
+（Software-as-a-Service）软件即服务，是一种通过Internet提供软件的模式，厂商将应用软件统一部署在自己的服务器上，客户可以根据自己实际需求，通过互联网向厂商订购所需的应用软件服务
+ - 用户不用再购买软件，而是向提供商租用基于web的软件，来管理企业经营活动，不用对软件进行维护，提供商会全权管理和维护软件，同时也提供软件的离线操作和本地数据存储
+
+
+
+Openstack组件
+• Horizon
+- 用于管理Openstack各种服务的、基于web的管理接口
+- 通过图形界面实现创建用户、管理网路、启动实例等操作
+
+• Keystone
+– 为其他服务提供认证和授权的集中身份管理服务
+– 也提供了集中的目录服务
+– 支持多种身份认证模式,如密码认证、令牌认证、以及AWS(亚马逊Web服务)登陆
+– 为用户和其他服务提供了SSO认证服务 
+
+• Neutron
+– 一种软件定义网络服务
+– 用于创建网络、子网、路由器、管理浮劢IP地址
+– 可以实现虚拟交换机、虚拟路由器
+– 可用于在项目中创建VPN
+
+• Cinder
+– 为虚拟机管理存储卷的服务
+– 为运行在Nova中的实例提供永久的块存储
+– 可以通过快照迚行数据备份
+– 经常应用在实例存储环境中,如数据库文件
+
+• Nova
+– 在节点上用于管理虚拟机的服务
+– Nova是一个分布式的服务,能够不Keystone交互实现认证,不Glance交互实现镜像管理
+– Nova被设计成在标准硬件上能够迚行水平扩展
+– 启劢实例时,如果有则需要下载镜像
+
+• Glance
+– 扮演虚拟机镜像注册的角色
+– 允许用户为直接存储拷贝服务器镜像
+– 这些镜像可以用于新建虚拟机的模板
+
+mount -t iso9660 -o ro,loop /iso /mnt/
+
+
+虚拟机1 openstack nova
+hostname:openstack
+   内存：9.5G
+   硬盘，系统：50G
+   硬盘 ：20G 空盘
+   网卡  2块 vbr、provate1
+
+虚拟机2 nova
+hostname:nova01
+   内存：5G
+   硬盘，系统：50G
+   网卡  2块 vbr、provate1
+
+
+
+
+
+
+
+
+
+
+
+
