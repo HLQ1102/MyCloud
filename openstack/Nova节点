@@ -1,0 +1,26 @@
+Nova
+
+1准备：
+• 配置两块网卡,不第一台Openstack服务器的两块网卡对应
+• 一块网卡用于主机间通信,另一块网卡用于隧道
+• DNS地址指向正确的服务器地址
+• 停止并禁用NetworkManager
+
+2.安装检查
+检查ifcfg-eth0 ifcfg-eth1 能ping通openstack主机
+检查 /etc/resolv.conf （nameserver 192.168.1.254 在第一行，以便openstack解析）
+检查chronyc sources -v 出现* 以确定stp服务器能够使用
+检查yum repolist (10731)
+检查 /etc/hosts
+关闭 selinux
+卸载firefwalld-* NetworkManager-*
+安装 yum install -y qemu-kvm libvirt-client 
+                   libvirt-daemon libvirt-daemon-driver-qemu 
+                   python-setuptools
+  
+3.修改执行节点安装
+]# vim answer.ini  //在openstack的基础上修改添加，在openstack主机上操作
+  98 CONFIG_COMPUTE_HOSTS=192.168.1.10,192.168.1.11
+ 102 CONFIG_NETWORK_HOSTS=192.168.1.10,192.168.1.11
+]#packstack --answer-file=answer.ini  //在openstack主机上操作
+

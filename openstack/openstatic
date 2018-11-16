@@ -300,12 +300,46 @@ cat ifcfg-eth0
 vim /etc/nova/nova.conf
 8465 vncserver_proxyclient_address=openstack.vbr
 
+openstack服务
 nova-api  //api接口
-
 nova-compute  //虚拟机的控制服务
 nova-console  //web平台的控制服务
-
 nova-novncproxy 
+
+ 
+
+浮动ip
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
