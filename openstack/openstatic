@@ -190,7 +190,7 @@ openstack环境准备
 • 检查配置主机网络参数(静态IP)
 • 检查配置主机yum源(12个),10731个包
 • 检查cinder-volumes卷组是否已经创建
-• 检查公钥是否导入
+• 检查公钥是否导入,
 • 查看相关软件包是否安装，（第6步额外软件包）
 • 检查NTP和DNS服务器是否可用
 
@@ -198,7 +198,7 @@ openstack环境准备
 1.安装packstack,openstack的安装部署工具
    yum install -y openstack-packstack
   1.1创建
-      packstack --gen-answer-file=answer.ini
+     ]# packstack --gen-answer-file=answer.ini
      //answer.ini与answer.txt是一样的，只是用vim打开answer.ini文件有颜色
 
   11 CONFIG_DEFAULT_PASSWORD=redhat     //设置默认密码
@@ -212,7 +212,7 @@ openstack环境准备
  936 CONFIG_NEUTRON_OVS_TUNNEL_IF=eth1  //配置隧道使用的网卡
 1179 CONFIG_PROVISION_DEMO=n //关闭DEMO测试
  
-  packstack    --answer-file=answer.ini
+ ]# packstack    --answer-file=answer.ini
   **** Installation completed successfully ******        //出现这个为成功
 
 
