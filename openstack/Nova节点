@@ -24,3 +24,59 @@ Nova
  102 CONFIG_NETWORK_HOSTS=192.168.1.10,192.168.1.11
 ]#packstack --answer-file=answer.ini  //在openstack主机上操作
 
+
+
+
+LVS
+
+NAT
+DR
+FULL-NAT  需要给系统内核打补丁，才能运行该模式
+
+
+网络通讯五源素 src,sport,protocl,dst,dport
+
+net模式：vip设置在lvs上，请求到达lvs后，改变数据包的dip和dport，然后根据自己的策略分发给自己的集群主机
+          集群主机回应数据包将dip和sip对换，sport和dport对换，到达lvs后，lvs再将dport和dip改变
+          最哦后回包给客户机，不能跨vlan代理主机群最大数量局限为200
+DR模式：vip设置在lvs上,请求到达lvs后，lvs根据自己调度策略将请求转发给集群主机，集群主机的环回口上绑定vip，回环口的ip不会与外界通
+         信，该vip用于给客户机回包，（在请求包的解析过程中linux的的内核处理机制是：数据包的目的包是自己，自己才给与回包）
+         回包的数据直接通过路由的方式回包给客户端，不经过lvs，增加另通信的效率，是nat的20倍（环回口绑定vip）。但是同样不能跨vlan
+full-nat模式：uip,vip,dip,rip
+             lvs受到请求包后，请求 uip ---> vip
+                                    伪装：dip ---> rip,变成lvs变成访问real server的数据包，该包可路由，到达目的主机
+                                    目的主机回报rip--->dip 
+                                      vip ---> uip 
+                数据包相当与在内网进行        
+
+zebor
+
+DPDK：替代linux内核
+DPDK+LVS+FULLNAT+OSPF：负载均衡
+  DPVS+OSPF+tengine
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

@@ -1,0 +1,212 @@
+云计算的要求
+运行和维护，排错
+
+vmware 
+
+Vsphere-->vcenter+windows 管理--->esxi(多个esxi.....esxi..esxi)
+vcenter依赖与sql server
+esxi是被深度定制的linux，管理着很多的虚拟机
+
+
+安装虚拟化服务器平台
+• KVM /QEMU /LIBVIRTD ---->组成平台
+ – KVM是 linux 内核的模块,它需要 CPU 的支持,采用硬件辅劣虚拟化技术 Intel-VT,AMD-V,内存的相关如Intel的 EPT 和 AMD 的 RVI 技术
+ – QEMU 是一个虚拟化的仿真工具,通过 ioctl 不内核kvm 交互完成对硬件的虚拟化支持
+ – Libvirt 是一个对虚拟化管理的接口和工具,提供用户端程序 virsh ,virt-install, virt-manager, virt-view 与用户交互
+  libvirtd：负责管理，协调虚拟机(LVM)
+  virsh、vir-manager：客户端软件，发送指令给libvirtd，libvirtd去管理虚拟机
+
+• 必备软件
+• qemu-kvm
+  – 为 kvm 提供底层仿真支持
+• libvirt-daemon
+  – libvirtd 守护进程,管理虚拟机
+• libvirt-client
+  – 用户端软件,提供客户端管理命令
+• libvirt-daemon-driver-qemu
+  – libvirtd 连接 qemu 的驱劢
+
+• 可选功能
+– virt-install
+# 系统安装工具
+  – virt-manager # 图形管理工具
+  – virt-v2v # 虚拟机迁移工具
+  – virt-p2v # 物理机迁移工具
+• 虚拟化平台的安装
+  yum install -y qemu-kvm \
+                 libvirt-daemon \
+                 libvirt-client \
+                 libvirt-daemon-driver-qemu
+systemctl start libvirtd
+
+• 虚拟机的组成
+  – 内核虚拟化模块(KVM)
+  – 系统设备仿真(QEMU)
+  – 虚拟机管理程序(LIBVIRT)
+  – 一个 XML 文件(虚拟机配置声明文件)
+  – 位置 /etc/libvirt/qemu/
+  – 一个磁盘镜像文件(虚拟机的硬盘)
+  – 位置 /var/lib/libvirt/images/
+
+]# LANG=en_CN.UTF-8   //使用英文编码
+]# LANG=zh_CN.UTF-8   //使用中文编码
+
+virsh基本管理操作
+
+• 查看KVM节点(服务器)信息
+  – virsh nodeinfo
+• 列出虚拟机
+  – virsh list [--all]
+• 列出虚拟网络
+  – virsh net-list [--all]
+• 查看挃定虚拟机的信息
+  – virsh dominfo 虚拟机名称
+
+• 运行|重启|关闭挃定的虚拟机
+  – virsh start|reboot|shutdown 虚拟机名称
+• 强制关闭挃定的虚拟机
+  – virsh destroy 虚拟机名称
+• 将挃定的虚拟机设为开机自劢运行
+  – virsh autostart 虚拟机名称
+
+虚拟机的磁盘镜像文件格式 QCOW2——> KVM默认 I/O效率:较高
+
+后端盘复用
+qemu-img create -b node.qcow2 -f qcow2 mycentos.qcow2 //定义前端盘mycentos.qcow2，以node.qcow2为模板
+
+
+
+• Copy On Write,写时复制
+  – 直接映射原始盘的数据内容
+  – 当原始盘的旧数据有修改时,在修改之前自劢将旧数据存入前端盘
+  – 对前端盘的修改丌回写到原始盘
+连接本地/远程KVM
+• 使用virsh客户端工具
+– 连接本地
+– virsh
+– virsh# connect qemu:///system (默认选项)
+– 连接远程
+– virsh# connect qemu+ssh://user@ip.xx.xx.xx:port/system
+
+
+虚拟机后端模板系统制作
+安装系统：
+配置第一个最简的centos系统
+安装源：网络安装
+语言：English,时区：上海
+关闭：KDUMP
+分区：选择Standard Partition 然后选择根分区-->完成退出
+开始安装：设置root密码
+
+1.使用vi配置yum源
+vim /etc/yum.repos.d/local.repo
+[local_source]
+name=Local CentOS source
+baseurl=ftp://192.168.1.254/CentOS7
+enabled=1
+gpgcheck=0
+
+2.安装常用工具包
+yum -y install git vim
+
+3.禁用selinux  /etc/selinux/config
+SELINUX=disabled
+
+4.卸载firewalld-*
+yum -y remove firewalld-*
+
+ 重点： 删除NetworkManager
+     cat ifcfg-eth0 
+          DEVICE="eth0" //设备驱动
+          ONBOOT="yes"  //开启自动启动
+          NM_CONTROLLED="no"   //NetworkManger 控制指定拒绝接收
+          TYPE="Ethernet"      //以太网类型
+          BOOTPROTO="dhcp"     //以dhcp获取ip地址
+          #IPADDR="192.168.1.XX"
+          #NETMASK="255.255.255.0"
+     cat ifcfg-eth0 > /etc/sysconfig/network-scripts/ifcfg-eth0
+     systemctl stop NetworkManager
+     yum -y remove NetworkManager-*
+ 
+ 安装常用的软件包
+ yum provides */ifconfig
+ yum -y install net-tools      //ifconfig网络管理工具包
+ yum -y install bridge-utils   //虚拟交换机的管理工具包
+ yum -y install bash-completion  //tab键补齐命令的工具包
+
+ 关闭系统默认路由条目
+ vim /etc/sysconfig/network
+   # Created by anaconda
+   NOZEROCONF="yes"
+
+5.打开虚拟机的console控制口
+]# cat grub 
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL="serial console"
+GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200"
+GRUB_CMDLINE_LINUX="biosdevname=0 net.ifnames=0 console=tty0 console=ttyS0,115200"
+GRUB_DISABLE_RECOVERY="true"
+]# cat grub > /etc/default/grub  
+重新定义系统内核文件
+]# grub2-mkconfig -o /boot/grub2/grub.cfg   //重新加载启动配置文件
+
+签名文件导入
+
+Console及磁盘分区配置
+• 添加 Console 配置及初除磁盘分区里的个性化信息
+  – /etc/default/grub
+   GRUB_CMDLINE_LINUX="biosdevname=0 net.ifnames=0
+   console=ttyS0,115200n8"
+   GRUB_DISABLE_LINUX_UUID="true"
+   GRUB_ENABLE_LINUX_LABEL="true"
+  – 重新生成 grub.cfg
+   grub2-mkconfig -o /boot/grub2/grub.cfg
+  – /etc/fstab 文件中到 UUID 手工修改成系统设备    //默认使用的是uuid对根分区进行挂载
+  – blkid 查看 uuid 对应的磁盘设备,修改 fstab 文件   
+
+前端盘不能比后端盘小
+
+yum -y install cloud-utils-growpart  //分区扩容的工具包
+
+
+清理日志
+1.关闭虚拟机
+2.真机执行virt-sysprep -d centos7.0
+    yum provides */virt-sysprep  //查找提供virt-sysprep命令的软件包，查找到后安装
+    yum -y install libguestfs-tools
+
+后端盘是只读，不能修改
+自定义虚拟机
+  cd /var/lib/libvirt/images/
+  qemu-img create -b node.qcow2 -f qcow2 node1.img 16G  //以node.qcow2为模板创建前端盘node1.img,大小为16G
+  sed 's,node,node1,' /root/桌面/nsd1807/node.xml  > /etc/libvirt/qemu/node1.xml
+ virsh define /etc/libvirt/qemu/node1.xml
+virsh start node1
+
+后端盘写脚本要在前端盘执行
+
+LANG=en_CN.UTF-8
+/usr/bin/growpart  /dev/vda 1
+/usr/sbin/xfs_growfs /
+
+
+
+线访问虚拟机
+• 使用guestmount工具
+  – 支持离线挂载 raw、qcow2 格式虚拟机磁盘
+  – 可以在虚拟机关机的情冴下,直接修改磁盘中的文档
+  – 方便对虚拟机定制、修复、脚本维护
+  !!! 需要注意 SELinux 机制的影响
+
+guestmount -a node1.img -i /mnt/
+chroot /mnt/
+使用完后用 umount /mnt/
+
+
+
+
+
+
