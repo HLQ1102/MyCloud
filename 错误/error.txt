@@ -1,0 +1,37 @@
+[root@openstack ~]# packstack --answer-file=answer.ini 
+Welcome to the Packstack setup utility
+
+The installation log file is available at: /var/tmp/packstack/20181117-175030-78bFBu/openstack-setup.log
+
+Installing:
+Clean Up                                             [ DONE ]
+Discovering ip protocol version                      [ DONE ]
+Setting up ssh keys                                  [ DONE ]
+Preparing servers                                    [ DONE ]
+Pre installing Puppet and discovering hosts' details [ DONE ]
+Preparing pre-install entries                        [ DONE ]
+Installing time synchronization via NTP              [ DONE ]
+Setting up CACERT                                    [ DONE ]
+Preparing AMQP entries                               [ DONE ]
+Preparing MariaDB entries                            [ DONE ]
+Fixing Keystone LDAP config parameters to be undef if empty[ DONE ]
+Preparing Keystone entries                           [ DONE ]
+Preparing Glance entries                             [ DONE ]
+Checking if the Cinder server has a cinder-volumes vg[ DONE ]
+Preparing Cinder entries                             [ DONE ]
+Preparing Nova API entries                           [ DONE ]
+Creating ssh keys for Nova migration                 [ DONE ]
+Gathering ssh host keys for Nova migration           [ DONE ]
+Preparing Nova Compute entries                       [ DONE ]
+Preparing Nova Scheduler entries                     [ DONE ]
+Preparing Nova VNC Proxy entries                     [ DONE ]
+Preparing OpenStack Network-related Nova entries     [ DONE ]
+Preparing Nova Common entries                        [ DONE ]
+Preparing Neutron LBaaS Agent entries                [ DONE ]
+Preparing Neutron API entries                     [ ERROR ]
+
+ERROR : "Couldn't detect ipaddress of interface eth1 on node 192.168.1.10"
+Please check log file /var/tmp/packstack/20181117-175030-78bFBu/openstack-setup.log for more information
+
+
+＃该错误是由于ｏｐｅｎｓｔａｃｋ主机的ｅｔｈ１的问题，重启一下ｅｔｈ１网卡，即可解决问题，或者将所需要的网卡都重启一下，就可以解决问题
