@@ -1,0 +1,301 @@
+什么是容器
+• 容器技术已经成为应用程序封装和交付的核心技术
+• 容器技术的核心有以下几个内核技术组成:
+– Cgroups(Control Groups)-资源管理
+– NameSpace-进程隔离：相当于在物理环境划分出来一定的区域，给客户使用
+– SELinux安全
+• 由于是在物理机上实施隔离,启动一个容器,可以像启动一个进程一样快速
+
+• linux底层的区域划分技术
+• Docker是完整的一套容器管理系统
+• Docker提供了一组命令,让用户更加方便直接地使用容器技术,而丌需要过多关心底层内核技术
+• 网络命名空间：拥有自己的空间
+
+Docker优点
+• 相比于传统的虚拟化技术,容器更加简洁高效
+• 传统虚拟机需要给每个VM安装操作系统
+• 容器使用的共享公共库和程序
+• 只能使用linux系统
+• 直接使用真机的内核
+
+Docker缺点
+• 容器的隔离性没有虚拟化强
+• 共用Linux内核,安全性有先天缺陷
+• SELinux难以驾驭
+• 监控容器和容器排错是挑战
+
+systemctl mask firewall   //将防火强指向空链接，阻止防火墙的启动
+
+两台虚拟机：4G ROM  16G RAM
+ip:192.168.1.11、 192.168.1.12
+
+1.安装docker软件，软件在./CLOUD/中
+yum -y install docker-engine-1.12.1-1.el7.centos.x86_64.rpm 
+               docker-engine-selinux-1.12.1-1.el7.centos.noarch.rpm
+
+systemctl start docker   //启动docker
+systemctl enable docker  //开机自启docker
+
+
+2.docker的基本使用
+• 在Docker中容器是基于镜像启动的
+• 镜像是启动容器的核心
+• 镜像采用分层设计
+• 使用快照的COW技术,确保底层数据不丢失
+docker的COW 分层使用，
+
+(1)操作镜像
+docker images //查看镜像
+docker search //搜索查找   ]# yum search //搜索镜像
+docker pull   //下载
+docker push   //上传   
+(2) 备份镜像
+]# docker save busybox:latest > busybox.tar
+(3) 恢复备份，（导入镜像）
+]# docker load < busybox.tar
+
+[root@docker2 ~]# docker images 
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+centos              latest              e934aafc2206        7 months ago        198.6 MB
+镜像仓库名称             镜像标签                  镜像ID              创建时间                 大小
+
+
+]# docker run -it 镜像名:标签名 要运行的命令
+要运行的命令：是镜像里面的命令
+//启动centos镜像生成一个容器
+  ]# docker run -it centos:latest /bin/bash 
+  ]# docker run -it centos:latest    //这样以容器的默认命令启动容器
+
+apt-get  //debian里面的yum
+dpkg     //debian里面的rpm
+
+
+• 命令列表
+– docker images //查看镜像列表
+– docker history //查看镜像制作历叱
+– docker inspect  [镜像| 容器| 网络] //查看镜像底层信息
+– docker pull //下载镜像
+– docker push //上传镜像
+
+查看容器的ID，查看容器列表
+]# docker ps -a
+
+
+查看容器的信息
+查看你容器的信息包含ip，mac等信息，如下执行
+[root@docker2 ~]# docker inspect d7caea0aedd4   //d7caea0aedd4为容器的ID
+在容器里面获取容器的hostname，容器的hostname也就是容器的ID
+
+• 命令列表
+– docker rmi //删除本地镜像
+– docker save //镜像另存为tar包
+– docker load //使用tar包导入镜像
+– docker search //搜索镜像
+– docker tag //修改镜像名称和标签
+注：启动中的容器不能删除镜像
+docker tag busybox:latest  busybox:abc   //修改tag标签
+docker tag busybox:latest  abc:oxx       //tag类似软连接
+
+docker -it                     //-t 分配一个终端 -i 以交互式进行运行 -d 运行在后端并返回id
+
+1.启动容器
+docker start 容器ID
+2.查看容器ID
+docker ps //查看正在运行的容器的ID,并显示具体详情
+docker ps -a //查看所有的容器的ID，并显示具体详情
+docker ps -qa //查看所有的容器的ID，仅仅是显示容器ID
+3.批量停止docker容器
+docker stop $(docker ps -aq)
+4.
+docker rm $(docker ps -aq)
+
+bg 将前台运行的程序放到后台去
+   ps 查看进程的PID及父PID
+
+上帝进程systemd
+必须要有上帝进程，不然系统会崩溃
+kill　-9  445 /是给上帝进程发信息，说要杀死pid为445的进程
+安装pstree
+yum provides
+
+docker attach eaa   //链接的式systemd进程，exit或者ctrl+c退出后systemd（１）　死亡容器崩溃
+
+docker 的nginx 容器
+web根目录：/usr/share/nginx/html
+配置文件目录：/etc/nginx/nginx.conf
+
+http 的nginx 容器
+web根目录：/usr/local/apache2/htdocs/
+配置文件目录：/usr/local/apache2/conf/httpd.conf
+过滤空行和注释显示：grep -v "#" /usr/local/apache2/conf/httpd.conf | grep -v "^$"
+apachectl start
+
+
+docker top 
+
+新配置容器（前端盘）,一台基础镜像,封装运行环境和镜像
+]# docker run -itd centos:latest
+]# docker exec -it d2 bash
+vi /etc/yum.repos.d/local.repo 
+   [local_source]
+   name=Local CentOS source
+   baseurl=ftp://192.168.1.254/system
+   enabled=1
+   gpgcheck=0
+iptable vim psmisc net-tools iproute
+history -w
+history -c
+]# docker commit d2 myos:label
+]# docker images 
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+myos                label               d6eacba590ef        52 seconds ago      278 MB
+
+
+自定义镜像
+• Dockerfile语法格式
+– FROM:基础镜像
+– MAINTAINER:镜像创建者信息
+– EXPOSE:开放的端口
+– ENV:设置变量
+– ADD:复制文件到镜像
+– RUN:制作镜像时执行的命令,可以有多个
+– WORKDIR:定义容器默认工作目录
+– CMD:容器启动时执行的命令,仅可以有一条CMD
+
+１．使用Dockerfile,制作基础镜像
+]# cat Dockerfile 
+FROM centos:latest
+RUN rm -rf /etc/yum.repos.d/*.repo
+ADD local.repo /etc/yum.repos.d/local.repo        //local.repo为当前路径下的文件
+RUN yum install -y vim net-tools psmisc iproute && yum clean all
+]# docker build -t myos:abc .      //"."表示当前路径下
+
+２．使用Dockerfile,制作sshd的镜像
+]# cat ../my2/Dockerfile 
+FROM myos:abc
+RUN yum install -y openssh-server initscripts 
+RUN echo 'aa' | passwd --stdin root
+ENV EnvironmentFile=/etc/sysconfig/sshd
+RUN sshd-keygen
+CMD ["/usr/sbin/sshd","-D"]
+
+３．使用Dockerfile,制作apache的镜像　　启动语句从/usr/lib/systemd/system/里查找启动语句和方法
+]# cat Dockerfile 
+FROM myos:sshd
+RUN yum -y install httpd
+RUN echo 'hello world' > /var/www/html/index.html
+ENV EnvironmentFile=/etc/sysconfig/httpd
+EXPOSE 80
+EXPOSE 443
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+
+４．使用Dockerfile,同时启动sshd和httpd服务
+]# cat Dockerfile
+FROM myos:sshd
+RUN yum -y install httpd
+RUN echo 'hello world' > /var/www/html/index.html
+ENV EnvironmentFile=/etc/sysconfig/httpd
+EXPOSE 80
+EXPOSE 443
+ADD run.sh /etc/rc.d/init.d/run.sh
+CMD ["/etc/rc.d/init.d/run.sh"]
+]# cat run.sh 
+#!/bin/bash
+/usr/sbin/sshd -D &
+/usr/sbin/httpd -DFOREGROUND
+
+
+自定义镜像仓库
+1.daemon.json配置文件,(在docker1上)
+cd /etc/docker
+vim daemon.json
+{
+"insecure-registries" : ["192.168.1.11:5000"]
+}
+:wq
+systemctl restart docker
+
+2.启动私有仓库,(在docker1上)
+docker run -itd -p 5000:5000 registry
+测试 curl http://192.168.1.11/v2------> 显示"{}"
+3.设置标签,(在docker1上)
+docker tag myos:abc  192.168.1.11:5000/myos:abc
+
+4.上传镜像,(在docker1上)
+docker push 192.168.1.11:5000/myos:abc
+
+5.使用镜像文件启动docker
+vim /etc/docker/daemon.json
+{
+"insecure-registries" : ["192.168.1.11:5000"]
+}
+:wq
+systemctl restart docker.service
+docker run -itd 192.168.1.11:5000/myos:abc
+
+http://192.168.1.11/v2------> 显示"{}"
+
+
+**练习
+1.安装1台nfs服务器,共享一个目录[ /etc/export -----> /disk  *(rw,no_root_squash) ]
+2.docker1 mount nfs的共享目录,并把这个目录映射进容器1 (nginx)
+3.docker2 mount nfs的共享目录,并把这个目录映射进容器1 (httpd)
+  目的:实现nginx和httpd共享一个web主页
+
+
+docker的网络架构
+ Linux网桥
+
+创建虚拟网卡
+cp ifcfg-eth0 ifcfg-eth0:1
+    
+
+创建虚拟交换机
+yum -y install bridge-utils  //安装所需的软件包
+]# cat ifcfg-br0 
+DEVICE="br0"    //更改设备驱动
+ONBOOT="yes"
+NM_CONTROLLED="no"
+TYPE="Bridge"     //更改设备类型
+BOOTPROTO="static"
+IPADDR="192.168.1.173"
+NETMASK="255.255.255.0"
+
+]# ifconfig br0 up     //启动虚拟交换机
+]# ifconfig br0 down   //停止虚拟交换机
+
+
+
+docker network create --subnet 10.10.10.0/24 docker1  //docker的虚拟交换机
+
+docker run -itd --network docker1 myos:httpd  //指定虚拟机
+
+创建一个容器
+]# docker run -itd -p 80:80 -v /var/webroot:/var/www/html myos:httpd  
+  //创建apache的容器,并启动httpd,端口80与主机的80端口映射,并将主机的/var/webroot映射到容器的/var/www/html目录,"-it"开启一个伪终端输入模式
+]# docker run -itd --network=docker1 -v /root/disk:/usr/share/nginx/html -p 80:80 nginx
+
+
+总结:
+ docker容器是一个运行在主机上的程序
+ 我们让这个程序可以在一定范围内调用主机的硬件资源,
+ 封装硬件的应用程序的执行环境,可以根据自己的需要更改环境
+
+
+k8s  ---> 集中管理docker的软件
+
+
+
+tree       //该包提供查看文件的层级目录,便于查看
+pstree -p 0
+cat /usr/lib/systemd/system/sshd.service
+http://sunlogin.oray.com/share?shareid=27839974
+
+
+
+CMD ["bash"]
+
+
+
+
+

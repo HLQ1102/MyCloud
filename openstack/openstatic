@@ -215,6 +215,12 @@ openstack环境准备
  ]# packstack    --answer-file=answer.ini
   **** Installation completed successfully ******        //出现这个为成功
 
+这时浏览器访问时不出现页面，需要修改15-horizon_vhost.conf这个文件
+cd /etc/httpd/conf.d/
+vi 15-horizon_vhost.conf
+　35   WSGIProcessGroup apache
+　36   WSGIApplicationGroup %{GLOBAL}     //添加这一行
+]#  apachectl  graceful  //重新载入配置文件
 
 cd /etc/sysconfig/network-script/
 cat ifcfg-br-ex       //多了一张网卡，夺走了eth0的ip地址
@@ -299,6 +305,8 @@ cat ifcfg-eth0
 当主机开机后出现1006错误时检查这个文件的8465行，检查等于号后面的值，
 vim /etc/nova/nova.conf
 8465 vncserver_proxyclient_address=openstack.vbr
+将openstack.vbr添加到/etc/hosts文件的　192.168.1.10　后面
+
 
 openstack服务
 nova-api  //api接口
@@ -306,20 +314,24 @@ nova-compute  //虚拟机的控制服务
 nova-console  //web平台的控制服务
 nova-novncproxy 
 
- 
+
 
 浮动ip
 
 
+添加nova节点
+
+修改answer.ini文件
 
 
 
 
-
-
-
-
-
+这时浏览器访问时不出现页面，15-horizon_vhost.conf文件被还原，需要重新修改这个文件
+cd /etc/httpd/conf.d/
+vi 15-horizon_vhost.conf
+　35   WSGIProcessGroup apache
+　36   WSGIApplicationGroup %{GLOBAL}     //添加这一行
+]# apachectl  graceful  //重新载入配置文件
 
 
 

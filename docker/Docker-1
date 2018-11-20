@@ -1,0 +1,141 @@
+什么是容器
+• 容器技术已经成为应用程序封装和交付的核心技术
+• 容器技术的核心有以下几个内核技术组成:
+– Cgroups(Control Groups)-资源管理
+– NameSpace-进程隔离：相当于在物理环境划分出来一定的区域，给客户使用
+– SELinux安全
+• 由于是在物理机上实施隔离,启动一个容器,可以像启动一个进程一样快速
+
+• linux底层的区域划分技术
+• Docker是完整的一套容器管理系统
+• Docker提供了一组命令,让用户更加方便直接地使用容器技术,而丌需要过多关心底层内核技术
+• 网络命名空间：拥有自己的空间
+
+Docker优点
+• 相比于传统的虚拟化技术,容器更加简洁高效
+• 传统虚拟机需要给每个VM安装操作系统
+• 容器使用的共享公共库和程序
+• 只能使用linux系统
+• 直接使用真机的内核
+
+Docker缺点
+• 容器的隔离性没有虚拟化强
+• 共用Linux内核,安全性有先天缺陷
+• SELinux难以驾驭
+• 监控容器和容器排错是挑战
+
+systemctl mask firewall   //将防火强指向空链接，阻止防火墙的启动
+
+两台虚拟机：4G ROM  16G RAM
+ip:192.168.1.11、 192.168.1.12
+
+1.安装docker软件，软件在./CLOUD/中
+yum -y install docker-engine-1.12.1-1.el7.centos.x86_64.rpm 
+               docker-engine-selinux-1.12.1-1.el7.centos.noarch.rpm
+
+systemctl start docker   //启动docker
+systemctl enable docker  //开机自启docker
+
+
+2.docker的基本使用
+• 在Docker中容器是基于镜像启动的
+• 镜像是启动容器的核心
+• 镜像采用分层设计
+• 使用快照的COW技术,确保底层数据不丢失
+docker的COW 分层使用，
+
+(1)操作镜像
+docker images //查看镜像
+docker search //搜索查找   ]# yum search //搜索镜像
+docker pull   //下载
+docker push   //上传   
+(2) 备份镜像
+]# docker save busybox:latest > busybox.tar
+(3) 恢复备份，（导入镜像）
+]# docker load < busybox.tar
+
+[root@docker2 ~]# docker images 
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+centos              latest              e934aafc2206        7 months ago        198.6 MB
+镜像仓库名称             镜像标签                  镜像ID              创建时间                 大小
+
+
+]# docker run -it 镜像名:标签名 要运行的命令
+要运行的命令：是镜像里面的命令
+//启动centos镜像生成一个容器
+  ]# docker run -it centos:latest /bin/bash 
+  ]# docker run -it centos:latest    //这样以容器的默认命令启动容器
+
+apt-get  //debian里面的yum
+dpkg     //debian里面的rpm
+
+
+• 命令列表
+– docker images //查看镜像列表
+– docker history //查看镜像制作历叱
+– docker inspect  [镜像| 容器| 网络] //查看镜像底层信息
+– docker pull //下载镜像
+– docker push //上传镜像
+
+查看容器的ID，查看容器列表
+]# docker ps -a
+
+
+查看容器的信息
+查看你容器的信息包含ip，mac等信息，如下执行
+[root@docker2 ~]# docker inspect d7caea0aedd4   //d7caea0aedd4为容器的ID
+在容器里面获取容器的hostname，容器的hostname也就是容器的ID
+
+• 命令列表
+– docker rmi //删除本地镜像
+– docker save //镜像另存为tar包
+– docker load //使用tar包导入镜像
+– docker search //搜索镜像
+– docker tag //修改镜像名称和标签
+注：启动中的容器不能删除镜像
+docker tag busybox:latest  busybox:abc   //修改tag标签
+docker tag busybox:latest  abc:oxx       //tag类似软连接
+
+docker -it                     //-t 分配一个终端 -i 以交互式进行运行 -d 运行在后端并返回id
+
+1.启动容器
+docker start 容器ID
+2.查看容器ID
+docker ps //查看正在运行的容器的ID,并显示具体详情
+docker ps -a //查看所有的容器的ID，并显示具体详情
+docker ps -qa //查看所有的容器的ID，仅仅是显示容器ID
+3.批量停止docker容器
+docker stop $(docker ps -aq)
+4.
+docker rm $(docker ps -aq)
+
+bg 将前台运行的程序放到后台去
+   ps 查看进程的PID及父PID
+
+上帝进程systemd
+必须要有上帝进程，不然系统会崩溃
+kill　-9  445 /是给上帝进程发信息，说要杀死pid为445的进程
+安装pstree
+yum provides
+
+docker attach eaa   //链接的式systemd进程，exit或者ctrl+c退出后systemd（１）　死亡容器崩溃
+
+docker 的nginx 容器
+web根目录：/usr/share/nginx/html
+配置文件目录：/etc/nginx/nginx.conf
+
+http 的nginx 容器
+web根目录：/usr/local/apache2/htdocs/
+配置文件目录：/usr/local/apache2/conf/httpd.conf
+过滤空行和注释显示：grep -v "#" /usr/local/apache2/conf/httpd.conf | grep -v "^$"
+
+
+docker top 
+
+
+
+
+
+http://sunlogin.oray.com/share?shareid=27839974
+
+
