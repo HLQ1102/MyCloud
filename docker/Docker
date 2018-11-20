@@ -91,12 +91,12 @@ dpkg     //debian里面的rpm
 – docker save //镜像另存为tar包
 – docker load //使用tar包导入镜像
 – docker search //搜索镜像
-– docker tag //修改镜像名称和标签
+– docker tag //修改镜像名称和标签 ,会在原基础上复制一个与源镜像一样的镜像出来
 注：启动中的容器不能删除镜像
-docker tag busybox:latest  busybox:abc   //修改tag标签
+docker tag busybox:latest  busybox:abc   //修改tag标签,原镜像任然存在
 docker tag busybox:latest  abc:oxx       //tag类似软连接
 
-docker -it                     //-t 分配一个终端 -i 以交互式进行运行 -d 运行在后端并返回id
+docker run -itd  nginx:latest         //-t 分配一个终端 -i 以交互式进行运行 -d 运行在后端并返回id
 
 1.启动容器
 docker start 容器ID
@@ -110,7 +110,19 @@ docker stop $(docker ps -aq)
 docker rm $(docker ps -aq)
 
 bg 将前台运行的程序放到后台去
-   ps 查看进程的PID及父PID
+ ps 查看进程的PID及父PID
+docker run //运行容器
+
+• 命令列表  以下命令都需要跟容器的id才能具体查看,启动,关闭,重启
+– docker ps //查看容器列表
+– docker stop //关闭容器
+– docker start //启动容器
+– docker restart //重启容器
+– docker attach|exec //进入容器
+– docker inspect //查看容器底层信息
+– docker top //查看容器进程列表
+– docker rm //删除容器
+
 
 上帝进程systemd
 必须要有上帝进程，不然系统会崩溃
@@ -119,7 +131,8 @@ kill　-9  445 /是给上帝进程发信息，说要杀死pid为445的进程
 yum provides
 
 docker attach eaa   //链接的式systemd进程，exit或者ctrl+c退出后systemd（１）　死亡容器崩溃
-
+                            需要使用ctrl+p+q才能安全的退出,不影响容器的退出
+                            该方式是以接管上帝进程的方式进入容器,当时用exit退出时,上帝进程关闭,容器崩溃
 docker 的nginx 容器
 web根目录：/usr/share/nginx/html
 配置文件目录：/etc/nginx/nginx.conf
@@ -131,24 +144,32 @@ web根目录：/usr/local/apache2/htdocs/
 apachectl start
 
 
-docker top 
+docker top 容器的ID  //查看容器里面的进程
+例子: docker top 1de1  
+UID   PID    PPID     C  STIME   TTY      TIME       CMD
+root  18819  18805    0  18:37   pts/1   00:00:00    nginx: master process nginx -g daemon off;
+用户id 进程id  父进程id
 
+*** docker commit
+  • 使用镜像启动容器,在该容器基础上修改
+  • 另存为一个新镜像
 新配置容器（前端盘）,一台基础镜像,封装运行环境和镜像
 ]# docker run -itd centos:latest
-]# docker exec -it d2 bash
-vi /etc/yum.repos.d/local.repo 
-   [local_source]
-   name=Local CentOS source
-   baseurl=ftp://192.168.1.254/system
-   enabled=1
-   gpgcheck=0
-iptable vim psmisc net-tools iproute
-history -w
-history -c
-]# docker commit d2 myos:label
+]# docker exec -it d2 bash            _
+vi /etc/yum.repos.d/local.repo         |
+   [local_source]                      |
+   name=Local CentOS source            |
+   baseurl=ftp://192.168.1.254/system  |
+   enabled=1                           |-----这部分命令在容器里面执行
+   gpgcheck=0                          |
+iptable vim psmisc net-tools iproute   |
+history -w                             |
+history -c                            _|
+]# docker commit d2 myos:label   //"d2"为容器的id
 ]# docker images 
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 myos                label               d6eacba590ef        52 seconds ago      278 MB
+
 
 
 自定义镜像
@@ -272,7 +293,7 @@ docker run -itd --network docker1 myos:httpd  //指定虚拟机
 
 创建一个容器
 ]# docker run -itd -p 80:80 -v /var/webroot:/var/www/html myos:httpd  
-  //创建apache的容器,并启动httpd,端口80与主机的80端口映射,并将主机的/var/webroot映射到容器的/var/www/html目录,"-it"开启一个伪终端输入模式
+  //创建apache的容器,并启动httpd,端口80与主机的80端口映射,并将主机的/var/webroot映射到容器的/var/www/html目录, "-itd"--> -t 分配一个终端 -i 以交互式进行运行 -d 运行在后端并返回id
 ]# docker run -itd --network=docker1 -v /root/disk:/usr/share/nginx/html -p 80:80 nginx
 
 
