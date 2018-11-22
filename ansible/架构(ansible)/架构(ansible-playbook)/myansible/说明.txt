@@ -1,0 +1,3 @@
+test.sh是以shell的形式输出json的语法格式,以达到ansible可读json的目的
+myhosts是ansible.cfg的主机列表
+ansiblle.cfg是ansible的主配置文件

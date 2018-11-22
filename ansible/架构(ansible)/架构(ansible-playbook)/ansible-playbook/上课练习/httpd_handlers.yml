@@ -1,0 +1,26 @@
+---
+- hosts: web
+  remote_user: root
+  tasks:
+    - yum:
+        name: httpd
+        state: installed
+    - lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen'
+        line: 'Listen 8080'
+      notify: 
+        - restart httpd
+    - replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^#ServerName'
+        replace: 'ServerName'
+      notify: 
+        - restart httpd
+    - shell: apachectl -t
+  handlers:
+    - name: restart httpd
+      service: 
+        name: httpd
+        state: restarted
+        enabled: yes

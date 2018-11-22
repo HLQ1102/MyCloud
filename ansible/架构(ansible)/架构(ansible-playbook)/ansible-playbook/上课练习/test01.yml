@@ -1,0 +1,9 @@
+---
+- hosts: all
+  remote_user: root
+  vars: 
+    vars1:
+      cat: "yum -y install"
+      exe: "lvm2"
+  tasks:
+    - shell: "{{vars1.cat}}"

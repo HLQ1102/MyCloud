@@ -1,0 +1,14 @@
+---
+- hosts: all
+  remote_user: root
+  vars:
+    user:
+      name: "nb"
+      group: "mail"
+  tasks:
+    - name: 123
+      user:
+        name: "{{user.name}}"
+        group: users
+        password: "{{'23456'|password_hash('sha512')}}"
+    - shell: chage -d 0 "{{user.name}}"

@@ -1,0 +1,23 @@
+---
+- hosts: mysql
+  remote_user: root
+  tasks:
+    - yum:
+        name: httpd
+        state: installed
+    - lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen(.*)80$'
+        line: 'Listen 80'
+    - replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^#ServerName'
+        replace: 'ServerName'
+    - shell: apachectl -t
+    - service: 
+        name: httpd
+        state: started
+    - service:
+        name: httpd
+        enabled: yes
+    - shell: echo 123 > /var/www/html/index.html

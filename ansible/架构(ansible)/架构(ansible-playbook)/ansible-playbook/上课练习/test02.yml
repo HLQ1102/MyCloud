@@ -1,0 +1,11 @@
+---
+- hosts: all
+  remote_user: root
+  vars:
+    user:
+      name: "nb"
+      group: "mail"
+  tasks:
+    - shell: useradd "{{user.name}}"
+      ignore_errors: True
+    - shell: echo "aa" | passwd --stdin "{{user.name}}"

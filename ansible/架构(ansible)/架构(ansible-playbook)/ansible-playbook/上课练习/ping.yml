@@ -1,0 +1,12 @@
+---
+- hosts: all
+  remote_user: root
+  vars:
+    user:
+      name: "dd"
+      group: "mail"
+  tasks:
+    - name: 123
+      user:
+        name: "{{user.name}}"
+        group: users
