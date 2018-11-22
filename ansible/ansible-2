@@ -316,7 +316,21 @@ register: result
 
 
 
-
+when的使用
+]# cat test2.yml 
+---
+- hosts: web2
+  remote_user: root
+  tasks:
+    - user:
+        name: "{{item.name}}"
+        group: "{{item.group}}"
+        password: "{{'123456'|password_hash('sha512')}}"
+      with_items:
+        - {name: "aa", group: "users"}
+        - {name: "bb", group: "mail" }
+        - {name: "cc", group: "wheel"}
+        - {name: "dd", group: "root" }
 
 
 
