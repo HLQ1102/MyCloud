@@ -1,0 +1,24 @@
+]# vim elasticsearch.yml
+.....
+ 23 node.name: {{ansible_hostname}}    # 设置变量,当使用ansible的模板setup传文件时,会将setup的json对象赋值到{{ansible_hostname}}中
+......
+:wq
+
+]# vim cat tran_config.yml
+---
+- hosts: all
+  remote_user: root
+  tasks:
+    - template:
+        src: elasticsearch.yml
+        dest: /etc/elasticsearch/elasticsearch.yml
+]# ansible-playbook tran_config.yml
+
+]# ssh web2 cat /etc/elasticsearch/elasticsearch.yml | grep -Pv '^(#|$)'
+]# ssh web3 cat /etc/elasticsearch/elasticsearch.yml | grep -Pv '^(#|$)'
+]# ansible all -m service -a 'name=elasticsearch state=started enabled=yes'
+
+
+批量部署公钥
+]# ssh-keygen -t rsa -b  2048 -N ''
+]# ansible all -m authorized_key -a "user=root exclusive=true manage_dir=true key='$(< /root/.ssh/id_rsa.pub)'" -k
