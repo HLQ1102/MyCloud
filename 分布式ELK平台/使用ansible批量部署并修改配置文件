@@ -22,3 +22,8 @@
 批量部署公钥
 ]# ssh-keygen -t rsa -b  2048 -N ''
 ]# ansible all -m authorized_key -a "user=root exclusive=true manage_dir=true key='$(< /root/.ssh/id_rsa.pub)'" -k
+
+使用ansible的yum和service模块安装并启动服务
+ansible all -m yum -a 'name="java-1.8.0-openjdk" state=installed'
+ansible all -m yum -a 'name=elasticsearch state=installed'
+ansible all -m service -a 'name=elasticsearch state=restarted enabled=yes'
