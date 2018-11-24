@@ -1,0 +1,172 @@
+
+批量上传数据,数据在elk.tar包里
+gzip -d logs.jsonl.gz
+gzip -d accounts.json.gz
+gzip -d shakespeare.json.gz
+curl -X POST "http://192.168.1.61:9200/_bulk" --data-binary @shakespeare.json
+curl -XPOST http://192.168.1.11:9200/xixi/haha/_bulk --data-binary @accounts.json
+curl -XPOST http://192.168.1.11:9200/xixi/haha_bulk --data-binary @accounts.json
+
+批量查询
+curl -XGET http://192.168.1.11:9200/_mget?pretty -d '
+{
+  "doc": [
+     {
+       "_index": "shakespeare",
+       "_type" : "act",
+       "_id"   : 0
+     },
+     {
+       "_index": "shakespeare",
+       "_type  : "line",
+       "_id"   : 0
+     }
+   ]
+}'
+
+
+准备yum源
+]# vim /etc/yum.repos.d/local.repo
+[local_source]
+name=Local CentOS source
+baseurl=ftp://192.168.1.254/system
+enabled=1
+#gpgcheck=0
+
+[local_ansble]
+name=Local_ansible
+baseurl=ftp://192.168.1.254/ansible
+enabled=1
+gpgcheck=0
+
+[local_se]
+name=Local_se
+baseurl=ftp://192.168.1.254/elk
+enabled=1
+gpgcheck=0
+:wq
+
+logstash 安装
+1.设置 /etc/hosts logstash要访问se集群
+
+2.安装java-1.8.0-openjdk
+]# yum install java-1.8.0-openjdk
+
+3.安装logstash
+]# yum -y install logstash
+
+4.创建空配置文件 /etc/logstash/logstash.conf
+]# touch /etc/logstash/logstash.conf  
+
+
+Logstash是什么
+• 是一个数据采集、加工处理以及传输的工具
+• 特点
+– 所有类型的数据集中处理
+– 丌同模式和格式数据的正常化
+– 自定义日志格式的迅速扩展
+– 为自定义数据源轻松添加插件
+
+
+logstash三大模块
+input{ 如何采集数据 }
+filter{ 如何处理数据 }
+output{ 把数据发送到哪里去 }
+
+
+Logstash类型及条件判断
+• Logstash里面的类型
+– 布尔值类型: ssl_enable => true
+– 字节类型: bytes => "1MiB"
+– 字符串类型: name => "xkops"
+– 数值类型: port => 22
+– 数组: match => ["datetime","UNIX"]
+– 哈希: options => {k => "v",k2 => "v2"}
+– 编码解码: codec => "json"
+– 路径: file_path => "/tmp/filename"
+– 注释: #
+
+Logstash类型及条件判断(续1)
+• Logstash条件判断
+– 等于: ==
+– 不等于: !=
+– 小于: <
+– 大于: >
+– 小于等于: <=
+– 大于等于: >=
+– 匹配正则: =~
+– 不匹配正则: !~
+
+Logstash类型及条件判断(续2)
+• Logstash条件判断
+– 包含: in
+– 不包含: not in
+– 不: and
+– 戒: or
+– 非不: nand
+– 非戒: xor
+– 复合表达式: ()
+– 取反符合:
+!()
+
+input {
+  stdin{}
+}
+filter{}
+output{
+  stdout{}
+}
+
+
+ls /root/.sincedb_e9a1772295a869da80134b5c4e75816e  //放置logstash的指针文件,记录
+
+
+input {
+  file {
+    path => ["/tmp/a.log"]
+    sincedb_path   => "/mnt/sincedb_acc1"
+    start_position => "beginning"
+    type => "http_log"
+  }
+  tcp {　　　　　　　　　　　网络通信五元组
+    mode => "server"　　　　要记录
+    host => "0.0.0.0"　　　
+    port => 8888
+    type => "tcplog"
+  }
+  udp {
+    port => 8888
+    type => "udplog"
+  }
+}
+
+filter{}
+
+output{
+  stdout{ codec => "rubydebug" }
+}
+
+
+syslog {
+  type => "syslog"
+}
+
+rsyslog 服务
+
+]#logger -p local0.notice -t NSD1807 "hello world" //将日志文件
+
+]# vim /etc/rsyslog.conf  
+*.* @@remote-host:514           #一个＠是tcp协议　两个＠＠是udp
+authpriv.*　　＠192.168.1.254:514　＃将安全的日志
+:wq
+]# systemctl restart rsyslog  //重启日志服务
+
+
+
+
+
+
+
+
+
+

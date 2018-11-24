@@ -1,0 +1,226 @@
+正则表达式
+ 匿名分组匹配 ()()  \1 \2 \3
+
+重定向
+echo 1234 > /dev/{tcp|udp}/176.204.13.101
+socket
+exec 1>f1   将当前终端的标准输出全部输出到文件f1
+
+什么是ELK
+• ELK是一整套解决方案,是三个软件产品的首字母缩写,很多公司都在使用,如:Sina、携程、华为、美团等
+• ELK分别代表
+– Elasticsearch:负责日志检索和储存
+– Logstash:负责日志的收集和分析、处理,由java开发
+– Kibana:负责日志的可视化
+• 这三款软件都是开源软件,通常是配合使用,而且又先后
+归于Elastic.co公司名下,故被简称为ELK
+ELK能做什么
+• ELK组件在海量日志系统的运维中,可用于解决
+– 分布式日志数据集中式查询和管理
+– 系统监控,包含系统硬件和应用各个组件的监控
+– 故障排查
+– 安全信息和事件管理
+– 报表功能
+
+linux apache     mysql             php
+L       A          M                P        (LAMP)
+L       K          E                L        (LKEL)
+linux kibana  Elasticsearch      logstash
+                  非关系型数据库
+
+先搭建数据库Elasticsearch,方便做数据链条,与其他的服务做测试
+再搭建logstatsh和kibana
+
+Elasticsearch部分
+
+• ElasticSearch是一个基于Lucene的搜索服务器。它
+提供了一个分布式多用户能力的全文搜索引擎,基于
+RESTful API的Web接口
+• Elasticsearch是用Java开发的,幵作为Apache许可
+条款下的开放源码发布,是当前流行的企业级搜索引
+擎。设计用于云计算中,能够达到实时搜索,稳定,
+可靠,快速,安装使用方便
+• 主要特点
+– 实时分析
+– 分布式实时文件存储,幵将每一个字段都编入索引
+– 文档导向,所有的对象全部是文档
+– 高可用性,易扩展,支持集群(Cluster)、分片和复
+制(Shards 和 Replicas)
+– 接口友好,支持JSON
+
+• ES没有什么
+– Elasticsearch没有典型意义的事务
+– Elasticsearch是一种面向文档的数据库
+– Elasticsearch没有提供授权和认证特性
+
+• 相关概念
+– Node: 装有一个ES服务器的节点
+– Cluster: 有多个Node组成的集群
+– Document: 一个可被搜索的基础信息单元
+– Index: 拥有相似特征的文档的集合 (相当于mysql的库)
+– Type: 一个索引中可以定义一种或多种类型
+– Filed: 是ES的最小单位,相当于数据的某一列
+– Shards: 索引的分片,每一个分片就是一个Shard
+– Replicas: 索引的拷贝
+
+SQL与NoSQL
+• ES不关系型数据库的对比
+– 在ES中,文档归属于一种 类型(type),而这些类型
+存在于索引(index)中,类比传统关系型数据库
+– DB  ->  Databases -> Tables -> Rows -> Columns
+– 关系型    数据库          表           行        列
+– ES ->   Indices -> Types -> Documents -> Fields
+– ES       索引          类型       文档            域(字段)
+
+
+ES
+
+
+建虚拟机
+设置主机名和ip对应
+设置yum源
+解决依赖关系 java-1.8jdk
+yum -y install clastic
+cd /etc/ela
+
+
+
+]# cd /etc/elasticsearch/
+]# vim elasticsearch
+     cluster.name: nsd1807
+     node.name: es1    # 本机的主机名
+     network.host: 0.0.0.0
+     discovery.zen.ping.unicast.hosts: ["se1", "se2","se3"]  
+
+建5台虚拟机
+ip 192.168.1.{0..5}
+真机: 
+]# mkdir /var/ftp/se
+]# tar -xf elk.tar -C /var/ftp/se
+]# createrepo /var/ftp/se
+
+虚拟机:
+]# vim /etc/yum.repos.d/local.repo
+[local_source]
+name=Local CentOS source
+baseurl=ftp://192.168.1.254/system
+enabled=1
+gpgcheck=0
+[local_se]
+name=Local se
+baseurl=ftp://192.168.1.254/se
+enabled=1
+gpgcheck=0
+]# yum -y install java-1.8.0-openjdk
+]# yum -y install elasticsearch
+]# vim config_se.sh
+#!/bin/bash
+ansible se1 -m lineinfile -a 'path=/etc/elasticsearch/elasticsearch.yml regexp="^network.host" line="network.host: se1"'
+ansible se2 -m lineinfile -a 'path=/etc/elasticsearch/elasticsearch.yml regexp="^network.host" line="network.host: se2"'
+ansible se3 -m lineinfile -a 'path=/etc/elasticsearch/elasticsearch.yml regexp="^network.host" line="network.host: se3"'
+ansible se4 -m lineinfile -a 'path=/etc/elasticsearch/elasticsearch.yml regexp="^network.host" line="network.host: se4"'
+ansible se5 -m lineinfile -a 'path=/etc/elasticsearch/elasticsearch.yml regexp="^network.host" line="network.host: se5"'
+:wq
+]# ansible all -m service -a 'name=elasticsearch state=restarted enabled=yes'
+
+]# rpm -ql elasticsearch  //查看elasticsearch安装的位置
+]# cd /usr/share/elasticsearch/
+]# ./plugin install ftp://192.168.1.254/se/elasticsearch-kopf-master.zip  //网络安装插件
+]# ./plugin install ftp://192.168.1.254/se/bigdesk-master.zip
+]# ./plugin install ftp://192.168.1.254/se/elasticsearch-head-master.zip
+
+
+lasticsearch  宏观上可读可写,内部自动转发给主库,从库原则上是不可写的
+lasticsearch  是将数据存放在分片存放在5台机器上,内部有存储算法,将数据存放在
+]# ./plugin install ftp://192.168.1.254/se/elasticsearch-head-master.zip
+
+http://118.144.89.240/info.php
+
+http://192.168.1.55:9200/_cat/    //查看可用的模块   
+http://192.168.1.55:9200/_cat?v   //详细信息
+http://192.168.1.55:9200/_cat?help  //帮助
+
+
+{ "settings": {
+    "index" : {
+            "number_of_shards": 5,             // 默认分5片
+               "number_of_replicas": 1
+                   }
+                }
+}
+
+]# curl -XPOST http://192.168.1.11:9200/tedu/ -d '
+{ "settings": {
+    "index" : {
+            "number_of_shards": 5,
+               "number_of_replicas": 1
+                   }
+                }
+} '
+
+
+
+
+增:
+]# curl -XPUT http://192.168.1.11:9200/tedu/nsd1807/1 -d '
+{
+  "姓名": "犇犇",
+  "性别": "男",
+  "爱好": "碰瓷",
+  "年龄": "35"
+}
+'
+
+curl -XPUT http://192.168.1.11:9200/tedu/nsd1807/2 -d '
+{
+  "姓名": "丁丁",
+  "性别": "男",
+  "爱好": "丝袜",
+  "年龄": "53"
+}
+'
+
+curl -XPUT http://192.168.1.11:9200/tedu/nsd1807/3 -d '
+{
+  "姓名": "静静",
+  "性别": "女",
+  "爱好": "败家",
+  "年龄": "20"
+}
+'
+
+curl -XPUT http://192.168.1.11:9200/tedu/nsd1807/4 -d '
+{
+  "姓名": "欣欣",
+  "性别": "男",
+  "爱好": "女",
+  "年龄": "38"
+}
+'
+
+改:
+curl -XPOST http://192.168.1.11:9200/tedu/nsd1807/3/_update -d '
+{
+  "doc": {"年龄": "18"}
+}
+'
+
+查:
+curl -XGET http://192.168.1.11:9200/tedu/nsd1807/3
+curl -XGET http://192.168.1.11:9200/tedu/nsd1807/3?pretty
+
+删除:
+curl -XDELETE http://192.168.1.11:9200/tedu/nsd1807/3
+
+
+
+安装kibana
+kibana
+  :5601
+
+
+
+
+
+
+
