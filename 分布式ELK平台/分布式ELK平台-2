@@ -162,6 +162,107 @@ authpriv.*　　＠192.168.1.254:514　＃将安全的日志
 ]# systemctl restart rsyslog  //重启日志服务
 
 
+yum -y install httpd
+yum -y install filebeat
+
+]# ls /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-2.0.5/patterns/grok-patterns
+ 
+
+
+安装elk
+5台elasticsearch 集群
+
+配置4G内存的虚拟机 安装logstash
+]# vim /etc/logstash/logstash.conf
+input {
+  beats {
+    port => 5044    #接收日志的软件,经logstash处理后的日志写进elasticsearch
+  }
+  file {
+    path => ["/tmp/a.log"]   #从/tmp/a.log里读数据,进行处理
+    #sincedb_path   => "/mnt/sincedb_acc1" #
+    sincedb_path => "/dev/null"  #将存放logstash上一次读文件的位置,以便下一次读,这里将这个信息放在黑洞里,便于测试
+    start_position => "beginning"       #logstash默认从文件最后开始读内容,每次启动logstash都从
+    type => "http_log"      #打标记,http_log
+  }
+  tcp {                    #接收来自tcp协议的日志
+    mode => "server"       #模式用服务器端的模式,等待别人来访问
+    host => "0.0.0.0"      #监听的地址
+    port => 8888           #监听的端口号8888
+    type => "tcplog"       #打标记
+  }
+  udp {                    #udp不存在服务器和客户端
+    port => 8888           #
+    type => "udplog"       #打标记
+  }
+  syslog {
+    type => "syslog"   记录来自514端口的系统日志syslog
+  } 
+}
+
+filter{
+  grok {
+    match => { "message" => "%{IP:client_ip}" }  #使用正则模板,过滤输入的数据,进行正则匹配
+  }
+}
+
+output{
+  stdout{ codec => "rubydebug" }  #标准输出到屏幕
+  if [type] == "http_log" {  将标记为http_log的数据发送到elasticsearch
+    elasticsearch {
+      hosts => ["192.168.1.55:9200"]   #elasticsearch的主机组
+      index => "weblog"                #设置索引为weblog
+      flush_size => 2000               #超过2000字节才存一次
+      idle_flush_time => 10            #每10秒才存一次
+    }
+  }
+}
+
+
+安装日志收集发送软件filebeat
+yum -y install filebeat
+//修改前配置
+]# grep -Pv "^\s*($|#)" /etc/filebeat/filebeat.yml
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/*.log
+      input_type: log
+  registry_file: /var/lib/filebeat/registry
+output:
+  elasticsearch:
+    hosts: ["localhost:9200"]
+shipper:
+logging:
+  files:
+    rotateeverybytes: 10485760 # = 10MB
+//修改后配置
+]# grep -Pv "^\s*($|#)" /etc/filebeat/filebeat.yml
+filebeat:
+  prospectors:
+    -
+      paths:
+        - /var/log/httpd/access_log
+      input_type: log
+      document_type: http_log
+  registry_file: /var/lib/filebeat/registry
+output:
+  logstash:
+    hosts: ["192.168.1.21:5044"] 
+shipper:
+logging:
+  files:
+    rotateeverybytes: 10485760 # = 10MB
+
+
+
+
+
+
+
+
+
 
 
 
