@@ -182,6 +182,8 @@ myos                label               d6eacba590ef        52 seconds ago      
 – RUN:制作镜像时执行的命令,可以有多个
 – WORKDIR:定义容器默认工作目录
 – CMD:容器启动时执行的命令,仅可以有一条CMD
+－ 进入Dockerfile文件所在目录,使用docker build -t myos:http . 
+   命令从当前目录寻找dockerfile文件定义新的镜像
 
 １．使用Dockerfile,制作基础镜像
 ]# cat Dockerfile 
