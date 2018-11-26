@@ -258,8 +258,31 @@ logging:
 
 
 
+设置标记将filebeat传输过来的数据输入到elasticsearch中去,/etc/logstash/logstash.conf的配置文件模板
+vim /etc/logstash/logstash.conf
+input {
+  beats {
+    add_field => {"beatType" => "http_log"}
+    port => 5044
+  }
+}
 
+filter{
+  grok {
+    match => { "message" => "%{IP:client_ip}" }
+  }
+}
 
+output{
+  if [beatType] == "http_log" {        #将beatType为http_log的数据日志存放在elasticsearch里,索引为
+    elasticsearch {                      weblog,
+      hosts => ["192.168.1.55:9200"]
+      index => "weblog"
+      flush_size => 2000
+      idle_flush_time => 10
+    }
+  }
+}
 
 
 
