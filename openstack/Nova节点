@@ -1,5 +1,4 @@
-Nova
-
+添加Nova节点
 1准备：
 • 配置两块网卡,不第一台Openstack服务器的两块网卡对应
 • 一块网卡用于主机间通信,另一块网卡用于隧道
@@ -18,12 +17,18 @@ Nova
                    libvirt-daemon libvirt-daemon-driver-qemu 
                    python-setuptools
   
-3.修改执行节点安装
-]# vim answer.ini  //在openstack的基础上修改添加，在openstack主机上操作
+3.修改执行节点安装，在openstack主机上操作
+]# vim answer.ini  //在openstack的基础上修改添加
   98 CONFIG_COMPUTE_HOSTS=192.168.1.10,192.168.1.11
  102 CONFIG_NETWORK_HOSTS=192.168.1.10,192.168.1.11
 ]#packstack --answer-file=answer.ini  //在openstack主机上操作
 
+4.这时浏览器访问时不出现页面，需要修改15-horizon_vhost.conf这个文件，在openstack主机上操作
+cd /etc/httpd/conf.d/
+vi 15-horizon_vhost.conf
+　35   WSGIProcessGroup apache
+　36   WSGIApplicationGroup %{GLOBAL}     //添加这一行
+]#  apachectl  graceful  //重新载入配置文件
 
 
 
