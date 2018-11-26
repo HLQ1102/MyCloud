@@ -151,21 +151,19 @@ syslog {
   type => "syslog"
 }
 
-rsyslog 服务
+调试rsyslog 服务
 
-]#logger -p local0.notice -t NSD1807 "hello world" //将日志文件
-
+]#logger -p local0.notice -t NSD1807 "hello world" //将日志文件以local0的标签写进自己的日志文件中
 ]# vim /etc/rsyslog.conf  
 *.* @@remote-host:514           #一个＠是tcp协议　两个＠＠是udp
 authpriv.*　　＠192.168.1.254:514　＃将安全的日志
 :wq
 ]# systemctl restart rsyslog  //重启日志服务
 
-
+ 
 yum -y install httpd
 yum -y install filebeat
-
-]# ls /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-2.0.5/patterns/grok-patterns
+]# ls /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-patterns-core-2.0.5/patterns/grok-patterns     #apache的logstash正则表达默认模板位置
  
 
 
