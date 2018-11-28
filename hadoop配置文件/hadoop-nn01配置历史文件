@@ -1,0 +1,645 @@
+ls
+mkdir .change
+mv autoBLK.sh createVM.sh ip.sh  .change/
+ls
+ls -a
+ls .change/
+rm -rf .change/createVM.sh 
+ls
+ls .change/
+cd .change/
+pwd
+vim /etc/rc.d/rc.local 
+poweroff
+ifconfig 
+ls
+cd root
+ls
+ifconfig 
+cd 
+ls
+exit
+ls /root
+exit
+vim /etc/yum.repos.d/local.repo 
+yum repolist
+yum -y install java-1.8.0-openjdk-devel
+tar Hadoop.zip 
+tar -xf Hadoop.zip 
+yum -y install unzip
+./autoBLK.sh 
+lsblk
+df -h
+ls
+rm -rf ?k??1?Ad???5??9?G???cg?*?XD?????x???lMN???T?P????3?I?`8?M??w?R?1?o3ӏd?I?l???????:"4Eʖ???2"???m?? ?
+flkdsjfkljlkdf
+exit
+./ip.sh 
+hostnamectl set-hostname hadoop-nn001
+vim /etc/hosts
+hostname
+root
+ifconfig 
+exit
+ks'
+ls
+ll
+rm -rf '?k??1?Ad???5??9?G???cg?*?XD?????x???lMN???T?P????3?I?`8?M??w?R?1?o3ӏd?I?l???????:"4Eʖ???2"???m?? ?'
+ls
+yum -y install unzip
+unzip Hadoop.zip 
+ls
+mv hadoop /usr/local/hadoop
+ls /usr/local/hadoop
+mv /usr/local/hadoop hadoop
+ls
+cd hadoop/
+ls
+tar -xf hadoop-2.7.6.tar.gz 
+ls
+ls hadoop-2.7.6
+du -sh hadoop-2.7.6
+mv hadoop-2.7.6 /usr/local/hadoop
+ls /usr/local/hadoop
+Hadoop模式
+• Hadoop的部署模式有三种
+– 单机
+知
+识
+讲
+解
+– 伪分布式
+java -version
+jps
+ls
+cd /usr/local/hadoop/
+./bin/hadoop
+cd ./etc/hadoop/
+vim hadoop-env.sh 
+./bin/hadoop
+cd /usr/local/hadoop/
+./bin/hadoop
+cd -
+cd 
+ls
+cd hadoop/
+ls
+scp hadoop-2.7.6.tar.gz 192.168.1.11:/root
+ls
+cd -
+cd /usr/local/hadoop/
+ls
+cd etc/
+ls
+cd hadoop/
+ls
+vim hadoop-env.sh 
+echo $JAVA_HOME
+export JAVE_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.131-11.b12.el7.x86_64/jre
+vim hadoop-env.sh
+rpm -ql java-1.8.0-openjdk
+ping hadoop-nn002
+vim /etc/hosts
+scp /etc/hosts hadoop-nn02:/etc/
+scp /etc/hosts hadoop-nn03:/etc/
+ls
+pwd
+cd ../../
+ls
+mkdir oo
+cp LICENSE.txt NOTICE.txt README.txt oo/
+ls
+ls oo
+cat oo/README.txt 
+cat oo/README.txt | wc -l
+grep root oo/README.txt
+grep a oo/README.txt
+grep and oo/README.txt
+grep code oo/README.txt
+java
+java -servion
+java -version
+vm
+VM
+ls
+cd oo
+cd ..
+ls
+cd /../
+ls
+cd -
+ls
+./bin/hadoop --help
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar 
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar wordcount
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar wordcount oo xx
+cd xxx
+cd xx
+ls
+cat _SUCCESS 
+ll
+cat part-r-00000 
+history
+vim /usr/local/hadoop/etc/hadoop/hadoop-env.sh
+cat part-r-00000 
+cat part-r-00000 | awk '{print $NF}'
+cat part-r-00000 | awk 'begin{print $NF}' 
+cat part-r-00000 | awk 'BEGIN{a=0}{if(a<$NF){a=$NF}}END{print a}' 
+grep 701 part-r-00000
+grep " 701 " part-r-00000
+grep '701' part-r-00000
+grep ' 701' part-r-00000
+grep " 701" part-r-00000
+cd ..
+ls
+pwd
+cd etc/hadoop/
+ls
+vim core-site.xml 
+vim slaves 
+cat  slaves
+ls
+ifconfig eth0
+hostname
+hostnamectl set-hostname hadoop-nn01
+exit
+jps
+cd /usr/local/hadoop/
+exit
+vim /etc/hosts
+for i in node1 node2 node3; do scp /etc/hosts $i:/etc/; done
+jps
+vim /etc/ssh/ssh_config 
+systemctl restart sshd
+ssh node1
+ssh node2
+ssh node3
+vim /etc/ssh/ssh_config 
+grep -v '^(#|$)' /etc/ssh/ssh_config
+grep -v '^\s*(#|$)' /etc/ssh/ssh_config
+ls
+grep -Pv '^\s*(#|$)' /etc/ssh/ssh_config
+for i in node1 node2 node3 ; do scp /etc/ssh/ssh_config $i:/etc/ssh/; done
+for i in node1 node2 node3 ; do ssh $i systemctl restart sshd; done
+ssh-keygen 
+for i in hadoop-nn01 node1 node2 node3; do ssh-copy-id $i; done
+ssh web1
+ssh node1
+ssh hadoop-nn01 
+vim /etc/hosts
+ls
+LS
+ls
+cd /usr/local/hadoop/etc/hadoop/
+ls
+vim core-site.xml 
+vim hdfs-site.xml 
+vim slaves 
+for i in node1 node2 node3; do scp -r ./ $i:/usr/local/hadoop/etc/hadoop/; ssh $i mkdir /var/hadoop; done
+for i in node2 node3; do scp -r /usr/local/hadoop/ $i:/usr/local/; ssh $i /var/hadoop
+for i in node2 node3; do scp -r /usr/local/hadoop/ $i:/usr/local/; ssh $i mkdir /var/hadoop; done
+pwd
+cd ../../
+./bin/hdfs namenode -format
+ssh node1 ls /usr/local/hadoop/
+ssh node2 ls /usr/local/hadoop/
+ssh node3 ls /usr/local/hadoop/
+./bin/hdfs namenode -format
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/ 192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+./bin/hdfs namenode -format  
+jps
+./sbin/start-dfs.sh
+rsync
+./bin/hdfs namenode -format
+mkdir /var/hadoop
+./bin/hdfs namenode -format
+mkdir /var/hadoop
+cd -
+vim core-site.xml 
+ping hadoop-nn01
+vim core-site.xml 
+vim hdfs-site.xml 
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/ 192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+cd -
+./bin/hdfs namenode -format
+./bin/start-dfs.sh
+cd -
+./bin/start-dfs.sh
+pwd
+cd -
+./bin/start-dfs.sh
+pwd
+./sbin/start-dfs.sh
+jps
+./bin/hdfs dfsadmin -report
+./sbin/start-dfs.sh
+jps
+vim  /usr/local/hadoop/logs/hadoop-root-datanode-node2.out
+cat /usr/local/hadoop/logs/hadoop-root-datanode-node2.out
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh
+jps
+history
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/ 192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+ssh node1 ls /usr/local/hadoop/
+ssh node2 ls /usr/local/hadoop/
+ssh node3 ls /usr/local/hadoop/
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh
+jps
+java -version
+jps
+cd etc/hadoop/
+ls
+vim core-site.xml 
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/ 192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+cd -
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh 
+pwd
+cd -
+vim core-site.xml 
+ssh node1 ls /var/hadoop/
+ss -ntulp :9000
+ss -ntulp  | grep :9000
+jps
+pwd
+vim hdfs-site.xml 
+
+ss -ntulp  | grep java
+kill 3430
+kill 3619
+ss -ntulp  | grep java
+ls
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/192.168.1.$i:/usr/local/hadoop/  & done
+for i in 11 12 13; do rsync -aSH --delete /usr/local/hadoop/ 192.168.1.$i:/usr/local/hadoop/ & done
+du -sh /usr/local/hadoop/
+pwd
+cd -
+./bin/hdfs namenode -format
+poweroff
+hostname
+exit
+./bin/hdfs namenode -format
+cd /usr/local/hadoop/
+./bin/hdfs namenode -format
+rm -rf /var/hadoop/
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh
+jps
+./bin/hdfs dfsadmin -report
+lfjl
+for i in 1 2 3; do scp /etc/yum.repos.d/local.repo node$i:/etc/yum.repos.d/; done
+for i in 1 2 3; do ssh-copy-id node$i; done
+for i in 1 2 3; do scp /etc/yum.repos.d/local.repo node$i:/etc/yum.repos.d/; done
+for i in 1 2 3; do scp /etc/hosts node$i:/etc/; done
+for i in 1 2 3; do scp /etc/ssh/ssh_config node$i:/etc/ssh/; done
+ssh node1
+ssh node2
+ssh node3 ls
+pwd
+cd -
+cd etc/hadoop/
+ls
+vim slaves 
+cat /etc/hosts
+vim core-site.xml 
+vim hdfs-site.xml 
+for i in 11 12 13 ; do rsync -aSH --delete /usr/local/hadoop/   192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+cd 
+du -sh /usr/local/hadoop/
+cd /usr/local/hadoop/
+ls
+./bin/hdfs namenode -format
+rm -rf /var/hadoop/
+mkdir /var/hadoop/
+ls /var/hadoop/
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh
+jps
+cd etc/hadoop/
+vim slaves 
+scp /etc/hosts /etc/yum.repos.d/local.repo 192.168.1.254:/root/桌面/hadoop
+ls
+scp core-site.xml hdfs-site.xml slaves 192.168.1.254:/root/桌面/hadoop
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar wordcount oo xx
+cd -
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar wordcount oo xx
+rm -rf /usr/local/hadoop/
+cd
+rm -rf /usr/local/hadoop/
+ls /usr/local/hadoop/
+jps
+rm -rf /var/hadoop/
+jps
+reboot
+cd hadoop/
+cd
+ls
+cd /usr/local/
+ls
+jps
+ls
+cd hadoop/
+ls
+tar -xf hadoop-2.7.6.tar.gz 
+cp -r hadoop-2.7.6/ /usr/local/hadoop
+cp /usr/local/hadoop
+cd /usr/local/hadoop
+ls
+cd etc/hadoop/
+ls
+ls hadoop-env.sh 
+vim hadoop-env.sh
+cd -
+ls
+mkidr oo
+mkdir oo
+cp *.txt oo/
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar  wordcount oo xx
+ssh node1 sl
+ssh node1 ls
+ssh node2 ls
+ssh node3 ls
+ssh hadoop-nn01ls
+ssh hadoop-nn01 ls
+cd -
+vim slaves 
+vim core-site.xml 
+mkdir /var/hadoop
+ls /var/hadoop
+ssh node1 mkdir /var/hadoop
+vim hdfs-site.xml 
+for i in 11 12 13; do rsync -aSH --delete /usr/local/hadoop/  192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+cd -
+rm -rf xx
+./bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar  wordcount oo xx
+pwd
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh
+vim etc/hadoop/
+cd etc/hadoop/
+vim core-site.xml 
+vim hdfs-site.xml 
+for i in 11 12 13; do rsync -aSH --delete /usr/local/hadoop/  192.168.1.$i:/usr/local/hadoop/  -e 'ssh' & done
+./bin/hdfs namenode -format
+rm -rf /var/hadoop/*
+cd -
+./bin/hdfs namenode -format
+./sbin/start-dfs.sh
+pwd
+./bin/hdfs dfsadmin -report
+pwd
+cd -
+ls
+vim core-site.xml 
+vim hdfs-site.xml 
+vim slaves 
+ls
+ls /var/hadoop/
+ls /var/hadoop/dfs/name
+lkjfs
+poweroff
+vim /etc/ansible/hosts 
+ansible all -m copy -a 'src=/etc/hosts dest=/etc/hosts'
+ansible all -m copy -a 'src=/usr/local/hadoop/etc/hadoop/slaves dest=/usr/local/hadoop/etc/hadoop/slaves'
+ssh-copy-id node5
+du -sh /usr/local/hadoop/
+ls /usr/local/hadoop/etc/hadoop/core-site.xml jps
+jps
+exit
+rm -rf /var/hadoop/*
+for i in 1 2 3 ; do ssh node$i rm -rf  /var/hadoop/*; done
+cd /usr/local/hadoop/
+./bin/hdfs namenode -format
+ ./sbin/start-dfs.sh
+jps
+./bin/hdfs dfsadmin -report
+ls /var/hadoop/dfs/name
+jps
+./bin/hdfs dfsadmin -report
+df -h
+jps
+jos
+jps
+jp
+jps
+ ls
+ls
+lsist
+list
+man list
+man ls
+RANG=zh_CN-UTF---8
+RANG=zh_CN-UTF8
+man ls
+who -b
+locala
+local
+jps
+cd etc/hadoop/
+ls
+vim mapred-site.xml.template 
+vim core-site.xml 
+vim mapred-site.xml.template 
+cp mapred-site.xml.template mapred-site.xml
+vim mapred-site.xml.template 
+ls
+vim yarn-site.xml 
+ls
+vim yarn-site.xml 
+vim mapred-site.xml
+for i in [1..3]
+for i in [1..3}; do rsync -aSH --delete /usr/local/hadoop/etc node${i}:/usr/local/hadoop/ -e 'ssh'; done
+cd 
+for i in [1..3}; do rsync -aSH --delete /usr/local/hadoop/etc node${i}:/usr/local/hadoop/ -e 'ssh'; done
+for i in {1..3}; do rsync -aSH --delete /usr/local/hadoop/etc node${i}:/usr/local/hadoop/ -e 'ssh'; done
+cd /usr/local/hadoop/
+./sbin/start-yarn.sh
+jps
+ifconfig eth0
+./bin/yarn node -list
+vim /etc/yum.repos.d/local.repo 
+yum -y install ansible
+vim /etc/ansible/ansible.cfg 
+vim /etc/ansible/hosts 
+ansible host --list-all
+ansible --help
+ansible --help | grep list
+ansible host --list-hosts
+ansible  --list-hosts
+ansible --help | grep list
+ansible list --list-hosts
+ansible all --list-hosts
+./bin/hadoop --help
+./bin/hadoop fs --help
+./bin/hadoop fs -ls /\
+./bin/hadoop fs -ls /
+./bin/hadoop fs -h
+man ./bin/hadoop 
+./bin/hadoop --help
+ls
+./bin/hadoop fs -mkdir /abc
+./bin/hadoop fs -ls /
+./bin/hadoop fs -touchz /redme
+./bin/hadoop fs -ls /
+./bin/hadoop fs 
+man ./bin/hadoop fs 
+./bin/hadoop fs -ls /abc/
+./bin/hadoop fs -put *.txt /abc/
+ls /
+cd /dev/shm/
+ls
+/usr/local/hadoop/bin/hadoop fs -get /abc/*.txt
+ls
+/usr/local/hadoop/bin/hadoop fs -ls /abc/
+/usr/local/hadoop/bin/hadoop fs -cp /abc/*.txt /
+/usr/local/hadoop/bin/hadoop fs -ls /
+cd /usr/local/hadoop/
+ls
+cd etc/hadoop/
+ls
+cd ..
+du -sh hadoop/
+scp -r hadoop/ 192.168.1.254:/root/桌面/hadoop
+cd hadoop/
+ls
+pwd
+cd ..
+cd bin/
+./hadoop -fs -ls hdfs://hadoop-nn01:9000
+./hadoop fs -ls hdfs://hadoop-nn01:9000
+./hadoop fs -ls hdfs://hadoop-nn01:9000/
+ls
+ljs
+ls
+ls'
+'
+./hadoop jar ../share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar  wordcount hdfs://hadoop-nn01:9000/abc hdfs://hadoop-nn01:9000/output
+./hadoop fs -cat /output/*
+./hadoop fs -cat /output/* | -grep 36
+./hadoop jar ../share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.6.jar  wordcount hdfs://hadoop-nn01:9000/abc hdfs://hadoop-nn01:9000/output1
+vim /etc/hosts
+ssh-copy-id node5
+cd -
+cd etc/hadoop/
+vim slaves 
+rsync -aSH --delete /usr/local/hadoop/ node5:/usr/local/
+ls /usr/local/hadoop/etc/hadoop/slaves
+rsync -aSH --delete /usr/local/hadoop/ node5:/usr/local/
+du -sh /usr
+rsync -aSH --delete /usr/local/hadoop/ node5:/usr/local/hadoop/
+jps
+pwd
+cd -
+./bin/hdfs dfsadmin 
+./bin/hdfs dfsadmin -setBalancerBandwidth 60000000
+./sbin/start-balancer.sh 
+./bin/hdfs dfsadmin -report
+ansible all -m copy -a 'src=/etc/hosts dest=/etc/hosts'
+./bin/hdfs dfsadmin -report
+cd
+/usr/local/hadoop/bin/hadoop fs -put CentOS7-1708.iso hdfs://hadoop-nn01/
+/usr/local/hadoop/bin/hadoop fs -put CentOS7-1708.iso hdfs://hadoop-nn01:9000/
+cd -
+./bin/hdfs dfsadmin -report
+ls etc/hadoop/exc
+vim etc/hadoop/hdfs-site.xml 
+touch etc/hadoop/exclude
+vim etc/hadoop/exclude
+./bin/hdfs dfsadmin
+./bin/hdfs dfsadmin -refreshNodes
+./bin/hdfs dfsadmin -report
+./bin/hdfs 
+history
+./bin/hadoop fs
+history
+pwd
+vim etc/hadoop/hdfs-site.xml 
+ls
+./sbin/yarn-daemon.sh 
+./sbin/yarn-daemon.sh list
+./sbin/yarn-daemon.sh --list
+./bin/yarn list
+./bin/yarn 
+./bin/yarn list
+./bin/yarn -list
+./bin/yarn --list
+./bin/yarn node -list
+ls
+jpwd
+pwd
+ ls
+ls logs/
+cat logs/hadoop-root-balancer-hadoop-nn01.log 
+ls logs/
+ls -l logs/
+vim /etc/hosts
+ansible all -m copy -a 'src=/etc/hosts dest=/etc/hosts'
+vim /etc/ansible/hosts 
+ansible all -m copy -a 'src=/etc/hosts dest=/etc/hosts'
+ssh nfsgw
+vim /etc/ansible/hosts 
+car /etc/passwd 
+cat /etc/passwd
+groupadd -g 200 nfsuser
+useradd -u 200 -g 200 -r nfsuser
+id 200
+man useradd 
+pwd
+./sbin/stop-all.sh 
+vim etc/hadoop/slaves 
+rm -rf logs/*
+ls logs/
+ls
+cd etc/hadoop/
+vim core-site.xml 
+rsync -aSH --delete /usr/local/hadoop  node1:/usr/local/
+rsync -aSH --delete /usr/local/hadoop  node2:/usr/local/
+rsync -aSH --delete /usr/local/hadoop  node3:/usr/local/
+cd -
+./sbin/start-dfs.sh start 
+./sbin/start-dfs.sh
+./bin/hdfs dfsadmin -report
+ls etc/hadoop/slaves 
+cat etc/hadoop/slaves
+ls etc/hadoop/slaves 
+cat etc/hadoop/slaves
+jps
+history
+pwd -
+./sbin/hadoop-daemon.sh --script  ./bin/hdfs start porttmap
+./sbin/hadoop-daemon.sh --script  ./bin/hdfs start portmap
+sudo -u nfsuser 'id'
+sudo -u nfsuser '/usr/local/hadoop/sbin/hadoop-daemon.sh --script /usr/local/hadoop/bin/hdfs start nfs3'
+su -l nfsuser
+history
+ls
+ls bin/
+ls
+ls bin/
+ls sbin/
+vim sbin/distribute-exclude.sh 
+vim sbin/start-dfs.cmd 
+git
+cd 
+git clone http://github.com/HLQ1102/new
+route add default gw 192.168.1.254
+git clone http://github.com/HLQ1102/new
+cd new/
+ls
+scp 个人人简历.docx 192.168.1.254:/root/桌面
+cd 
+cd /usr/local/hadoop/
+cd etc/hadoop/
+ls
+ls mapred-site.xml
+vim mapred-site.xml
+pwd
+cd -
+./bin/hdfs dfsadmin -report
+free -h
+ansible all -m shell -a 'free -h'
+ansible all -m shell -a 'poweroff'
+poweroff

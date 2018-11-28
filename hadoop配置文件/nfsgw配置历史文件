@@ -1,0 +1,92 @@
+ls
+mkdir .change
+mv autoBLK.sh createVM.sh ip.sh  .change/
+ls
+ls -a
+ls .change/
+rm -rf .change/createVM.sh 
+ls
+ls .change/
+cd .change/
+pwd
+vim /etc/rc.d/rc.local 
+poweroff
+ifconfig 
+ls
+cd root
+ls
+ifconfig 
+cd 
+ls
+exit
+ls /root
+exit
+ls /usr/local/hadoop/
+vim /etc/yum.repos.d/local.repo 
+yum -y install java-1.8.0-openjdk-devel
+jps
+cd /usr/local/hadoop/
+ls
+./sbin/hadoop-daemon.sh start datanode
+jps
+hostnamectl set-hostname nfsgw
+cat /etc/hostname 
+exit
+jps
+./bin/hdfs dfsadmin -report
+cd /usr/local/hadoop/
+./bin/hdfs dfsadmin -report
+vim etc/hadoop/slaves 
+cat /etc/hosts
+./sbin/hadoop-daemon.sh stop datanode
+jps
+./sbin/hadoop-daemon.sh start datanode
+jps
+groupadd -g 200 nfsuser
+useradd -g 200 -u 200 -r nfsuser
+id 200
+id nfsuser
+exit
+cat /etc/exports 
+exit
+ls
+ls -a
+cd /usr/local/
+rm -rf hadoop/
+rsync -aSH --delete hadoop-nn01:/usr/local/hadoop /usr/local/
+cat /etc/hosts
+cd hadoop/
+ls
+yum remove
+vim etc/hadoop/hdfs-site.xml 
+history
+rm -rf /usr/local/hadoop/logs/*
+pwd
+cd etc/hadoop/
+ls
+vim etc/hadoop/hdfs-site.xml 
+vim hdfs-site.xml 
+mkdir /var/nfsdir
+vim hdfs-site.xml 
+rm -rf /var/nfsdir
+mkdir /var/nfstmp
+vim hdfs-site.xm
+vim hdfs-site.xml
+chown 200.200 /var/nfstmp/
+setfacl -m user:nfsuser:rwx /usr/local/hadoop/logs/
+getfacl /usr/local/hadoop/logs/
+su -l nfsuser
+ls /var/nfstmp/
+su -l nfsuser
+./sbin/hadoop-daemon.sh --script ./bin/hdfs start portmap
+pwd
+cd -
+./sbin/hadoop-daemon.sh --script ./bin/hdfs start portmap
+su -l nfsuser
+history
+nfs.map
+showmount
+df -h
+hostnamectl set-hostname node5
+./ip.sh 
+./autoBLK.sh 
