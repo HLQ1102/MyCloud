@@ -1,0 +1,192 @@
+>>> import shutil
+>>> f1 = open('/etc/hosts')
+>>> f2 = open('/tmp/zj.txt', 'w')
+>>> shutil.copyfileobj(f1, f2)    # copy文件对象
+>>> f1.close()
+>>> f2.close()
+>>> shutil.copyfile('/etc/hosts', '/tmp/abcd.txt')   # copy文件名
+>>> shutil.copy('/etc/hosts', '/tmp/aaaa.txt')   # 目标可能是目录
+>>> shutil.copy('/etc/passwd', '/tmp/')
+>>> shutil.copy2('/etc/passwd', '/tmp/')   # 相当于cp -p
+>>> shutil.copytree('/etc/security', '/tmp/anquan')  # cp -r
+>>> shutil.move('/tmp/zj.txt', '/var/tmp/')  # mv
+>>> shutil.rmtree('/tmp/anquan')   # rm -rf
+>>> shutil.rmtree('/var/tmp/zj.txt')   # 不能删除单个文件
+>>> import os
+>>> os.remove('/var/tmp/zj.txt')
+>>> shutil.chown('/tmp/passwd', user='bob', group='bob')
+>>> help(shutil.rmtree)
+
+>>> x = y = 10
+>>> id(x)
+9348224    # 显示变量在内存的地址
+>>> id(y)
+9348224
+>>> x = 20
+>>> id(x)
+9348544
+>>> y       # y的值不变
+>>> a = b = [10, 20]
+>>> id(a)
+140225192670152
+>>> id(b)
+140225192670152
+>>> a[0] = 100
+>>> a
+[100, 20]
+>>> b
+[100, 20]
+
+>>> a, b = 10, 20   # 相当于是a=10; b=20
+>>> a
+10
+>>> b
+20
+>>> a, b = b, a     # a和b的值互换
+
+标识符：就是个名字，包括变量、模块、类、函数
+
+关键字
+>>> import keyword
+>>> keyword.kwlist
+>>> keyword.iskeyword('len')
+>>> 'for' in keyword.kwlist
+
+http://yiyibooks.cn/ -> python352文档 -> 库参考
+
+
+编写程序的流程、步骤：
+1、发呆、思考：在脑海里像过电影一样，想想程序是怎么运行的（交互的？非交互的？）
+交互的：考虑屏幕上提示什么，用户回答什么
+2、思考程序有哪些功能。将这些功能创建函数，编写程序框架
+def get_fname():
+
+
+def get_content():
+
+
+def wfile(fname, content):
+
+
+if __name__ == '__main__':
+    fname = get_fname()
+    content = get_content()
+    wfile(fname, content)
+3、完成函数代码
+
+>>> names = ['bob', 'alice', 'tom']
+>>> max(names)
+>>> min(names)
+
+
+
+字符串格式化
+'' % ()
+>>> '%s: %s' % ('bob', 22)   # %s / %d 常用
+>>> '%s: %d' % ('bob', 22)
+>>> '97 is %c' % 97   # %c转换数字成为对应的ascii码，了解
+>>> '97 is %#o' % 97  # 不常用
+>>> '97 is %#x' % 97  # 不常用
+>>> '10000 is %e' % 10000  # 不常用
+>>> '10/3 is %f' % (10 / 3)  # 不常用
+>>> '10/3 is %d' % (10 / 3)
+>>> '%10s%10s' % ('name', 'age')   # 常用，定义字段宽度为10个字节
+>>> '%-10s%-10s' % ('name', 'age')   # 常用，左对齐
+
+>>> '{}: {}'.format('bob', 22)
+'bob: 22'
+>>> '{}: {}'.format(22, 'bob')
+'22: bob'
+>>> '{1}: {0}'.format(22, 'bob')
+'bob: 22'
+>>> '{0[1]}: {0[0]}'.format([22, 'bob'])
+
+
+>>> win_path = 'C:\temp\new.txt'
+>>> print(win_path)   # \t成为tab，\n成为回车
+>>> win_path = 'C:\\temp\\new.txt'
+>>> print(win_path)
+>>> wpath = r'C:\temp\new.txt'   # r表示真实字符串、原始字符串
+>>> print(wpath)
+>>> wpath   # 查看python是如何存储的
+
+字符串方法
+>>> hi = 'hello world!'
+>>> '  hello world   '.strip()   # 删除两端空白字符，常用
+>>> '  hello world   '.lstrip()
+>>> '  hello world   '.rstrip()
+>>> hi.upper()
+>>> hi.lower()
+>>> hi.startswith('h')       # 以h开头吗？
+>>> hi.startswith('he')
+>>> hi.endswith('abc')       # 以abc结尾吗？
+>>> hi.replace('l', 'm')     # 替换
+>>> hi.center(50)            # 居中
+>>> hi.center(50, '*')
+>>> hi.ljust(50, '*')
+>>> hi.rjust(50, '*')
+>>> '12345'.isdigit()        # 判断是否是数字
+True
+>>> 'hao123'.isdigit()
+False
+>>> 'hao123'.islower()
+True
+>>> 'hao123'.isupper()
+>>> 'hao 123 abc'.split()
+>>> 'hello.tar.gz'.split('.')
+
+
+>>> alist = [10, 20, 30, 'bob', 'alice']
+>>> alist[-1] = 100
+>>> alist.remove('bob')   # 删除第一个bob
+>>> alist.append(25)
+>>> alist.sort()
+>>> alist.reverse()
+>>> alist.pop()   # 默认删除最后一项
+>>> alist.pop(1)   # 弹出下标是1的项
+>>> alist.insert(1, 50)   # 在下标为1的位置插入50
+>>> alist.extend([200, 10, 39, 125])   # 扩展列表
+>>> alist.extend('abc')
+>>> alist.append('abc')   # 注意和extend的区别
+>>> alist.index(50)   # 获取50的下标，没有50这个元素则报错
+
+
+>>> atuple = (10, 20, 30, 20, [1, 2, 3])
+>>> atuple.count(20)   # 统计有多少个20
+>>> atuple.index(20)   # 第一个20的下标
+>>> atuple[-1].append(4)    # 理解即可，很少有应用
+>>> atuple[-1][0] = 100
+
+
+单元素元组必须有逗号，否则不表示元组
+>>> a = (10)
+>>> len(a)      # 报错
+>>> type(a)     # 整数
+>>> a = (10,)
+>>> len(a)
+1
+>>> type(a)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

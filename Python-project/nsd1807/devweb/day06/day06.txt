@@ -1,0 +1,165 @@
+新建django项目
+1、创建项目
+(djenv) [root@room8pc16 day06]# django-admin startproject myblog
+(djenv) [root@room8pc16 day06]# cd myblog/
+2、新建应用
+(djenv) [root@room8pc16 myblog]# python manage.py startapp blog
+3、修改配置
+# myblog/settings.py
+ALLOWED_HOSTS = '*'
+INSTALLED_APPS = [
+    ... ...
+    'blog',
+]
+LANGUAGE_CODE = 'zh-hans'
+TIME_ZONE = 'Asia/Shanghai'
+USE_TZ = False
+4、启动服务进行测试
+(djenv) [root@room8pc16 myblog]# python manage.py runserver 0:80
+
+5、授权，以/blog/开头的URL授权给应用
+# myblog/urls.py
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^blog/', include('blog.urls')),
+]
+6、在应用中创建URLConfig文件
+# blog/urls.py
+from django.conf.urls import url
+
+urlpatterns = [
+]
+7、以/blog/hello/对应hello函数
+# blog/urls.py
+from django.conf.urls import url
+from . import views
+
+urlpatterns = [
+    url(r'^hello/$', views.hello, name='hello'),
+]
+# blog/views.py
+from django.shortcuts import render, HttpResponse
+
+def hello(request):
+    return HttpResponse('<h1>Hello World!</h1>')
+
+
+RESTful API
+http://www.runoob.com/w3cnote/restful-architecture.html
+REST全称是Representational State Transfer，中文意思是表述（编者注：通常译为表征）性状态转移。
+REST指的是一组架构约束条件和原则。REST本身并没有创造新的技术、组件或服务，
+而隐藏在RESTful背后的理念就是使用Web的现有特征和能力，更好地使用现有Web标准中的一些准则和约束。
+
+8、创建模型
+# blog/models.py
+from django.db import models
+
+class Blog(models.Model):
+    title = models.CharField(max_length=100)
+    pub_date = models.DateTimeField()
+    text = models.TextField()
+
+    def __str__(self):
+        return self.title
+(djenv) [root@room8pc16 myblog]# python manage.py makemigrations
+(djenv) [root@room8pc16 myblog]# python manage.py migrate
+9、创建管理员用户
+(djenv) [root@room8pc16 myblog]# python manage.py createsuperuser
+10、把模型注册到后台管理界面
+# blog/admin.py
+from django.contrib import admin
+from .models import Blog
+
+admin.site.register(Blog)
+
+11、实现blog
+(1) URL
+    url(r'^$', views.index, name='index'),
+(2) views.py
+def index(request):
+    return render(request, 'index.html')
+(3) blog/templates/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的博客</title>
+</head>
+<body>
+我的博客
+</body>
+</html>
+
+12、修改视图函数，将文章取出发送到HTML模板
+def index(request):
+    articles = Blog.objects.order_by('-pub_date')
+    return render(request, 'index.html', {'articles': articles})
+13、修改模板文件index.html，显示文章
+<body>
+{% for article in articles %}
+    <h2>{{ article.title }}</h2>
+    <div>{{ article.pub_date }}</div>
+    <div>{{ article.text }}</div>
+{% empty %}
+    <h2>尚无文章发布</h2>
+{% endfor %}
+</body>
+14、发布文章时，时间不应该由用户手工书写，应该是程序自动添加。修改models.py
+    pub_date = models.DateTimeField(auto_now_add=True)
+(djenv) [root@room8pc16 myblog]# python manage.py makemigrations
+(djenv) [root@room8pc16 myblog]# python manage.py migrate
+15、在index.html中加入表单，实现发布文章的功能
+<body>
+<form action="" method="post">
+    <label>标题：</label><input type="text" name="title"><br>
+    <textarea name="content" cols="80" rows="10"></textarea><br>
+    <input type="submit" value="发 布">
+</form>
+<hr>
+{% for article in articles %}
+    <h2>{{ article.title }}</h2>
+    <div>{{ article.pub_date }}</div>
+    <div>{{ article.text }}</div>
+{% empty %}
+    <h2>尚无文章发布</h2>
+{% endfor %}
+</body>
+
+16、当表单提交数据时，会出现403CSRF失败，解决方法是在表单中加入验证。
+<form action="" method="post">
+    {% csrf_token %}
+    <label>标题：</label><input type="text" name="title"><br>
+    <textarea name="content" cols="80" rows="10"></textarea><br>
+    <input type="submit" value="发 布">
+</form>
+
+17、接收网页POST过来的数据
+def index(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        Blog.objects.get_or_create(title=title, text=content)
+
+    articles = Blog.objects.order_by('-pub_date')
+    return render(request, 'index.html', {'articles': articles})
+
+18、博客正文没有分段，修正该问题，可以在模板文件中使用过滤功能
+将以下行：
+    <div>{{ article.text }}</div>
+修改为：
+    <div>{{ article.text|linebreaks }}</div>
+
+
+
+
+
+
+
+
+
+
+
+

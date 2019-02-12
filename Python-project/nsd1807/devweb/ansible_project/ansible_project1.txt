@@ -1,0 +1,572 @@
+ansible项目
+一、项目目标
+1、通过web界面显示所有服务器信息
+2、通过web界面添加主机/组
+3、通过web界面添加模块及参数
+4、通过web界面在指定的主机/组上执行选定的任务
+二、准备环境
+1、在虚拟环境中安装ansible
+[root@room8pc16 ansible_project]# source /opt/djenv/bin/activate
+(djenv) [root@room8pc16 zzg_pypkgs]# cd ansible_pkg/
+(djenv) [root@room8pc16 ansible_pkg]# pip install *
+(djenv) [root@room8pc16 zzg_pypkgs]# cd ansible-cmdb_pkgs/
+(djenv) [root@room8pc16 ansible-cmdb_pkgs]# pip install *
+(djenv) [root@room8pc16 zzg_pypkgs]# cd sqlalchemy_pkgs/
+(djenv) [root@room8pc16 sqlalchemy_pkgs]# pip install *
+2、准备3台虚拟机作为测试机，我这里采用的是node3-node5(192.168.4.3-4.5)
+配置IP地址、主机名、yum、免密登陆
+三、项目规划
+1、数据库规划
+(1) 主机组: 组名
+(2) 主机：主机名、IP地址、组
+(3) 模块：模块名
+(4) 参数：参数的key-val对，模块
+2、URL
+(1) 主页http://127.0.0.1/ 用于列出所有的任务[主机信息、添加主机/组、添加模块、执行任务]
+(2) http://127.0.0.1/webansi/ 用于显示所有主机的信息
+(3) http://127.0.0.1/webansi/addhosts/  -> 用于添加主机/组
+(4) http://127.0.0.1/webansi/addmodules/  -> 用于添加模块/参数
+(5) http://127.0.0.1/webansi/tasks/  -> 用于执行任务
+
+四、初始化项目
+1、创建项目myansible、创建应用webansi
+(djenv) [root@room8pc16 ansible_project]# django-admin startproject myansible
+(djenv) [root@room8pc16 ansible_project]# cd myansible/
+(djenv) [root@room8pc16 myansible]# python manage.py startapp webansi
+2、修改pycharm配置中的django设置
+3、修改配置settings.py
+ALLOWED_HOSTS = '*'
+INSTALLED_APPS = [
+    ... ...
+    'webansi',
+]
+LANGUAGE_CODE = 'zh-hans'
+TIME_ZONE = 'Asia/Shanghai'
+USE_TZ = False
+
+五、编写模型
+1、创建模型
+# webansi/models.py
+from django.db import models
+
+class HostGroup(models.Model):
+    groupname = models.CharField(max_length=50, unique=True, null=False)
+
+    def __str__(self):
+        return self.groupname
+
+class Host(models.Model):
+    hostname = models.CharField(max_length=100, unique=True, null=False)
+    ipaddr = models.CharField(max_length=15, null=False)
+    group = models.ForeignKey(HostGroup)
+
+    def __str__(self):
+        return '%s => %s' % (self.hostname, self.group)
+
+class Module(models.Model):
+    module_name = models.CharField(max_length=50, unique=True, null=False)
+
+    def __str__(self):
+        return self.module_name
+
+class Argument(models.Model):
+    argument_text = models.CharField(max_length=100, unique=True, null=False)
+    module = models.ForeignKey(Module)
+
+    def __str__(self):
+        return "%s => %s" % (self.module, self.argument_text)
+2、生成数据库表
+(djenv) [root@room8pc16 myansible]# python manage.py makemigrations
+(djenv) [root@room8pc16 myansible]# python manage.py migrate
+3、查看sqlite3数据库
+(djenv) [root@room8pc16 myansible]# sqlite3 db.sqlite3
+sqlite> .tables    # 列出所有的表
+sqlite> .schema webansi_hostgroup   # 查看表结构
+
+六、授权，将以http://127.0.0.1/webansi/开头的URL交给webansi应用处理
+1、修改myansible/urls.py
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^webansi/', include('webansi.urls')),
+]
+2、创建webansi/urls.py
+from django.conf.urls import url
+
+urlpatterns = [
+]
+
+七、制作首页http://127.0.0.1/
+1、当访问首页时，使用应用中的视图函数进行响应
+# myansible/urls.py
+from django.conf.urls import url, include
+from django.contrib import admin
+from webansi import views
+
+urlpatterns = [
+    url(r'^$', views.index, name='index'),
+    url(r'^admin/', admin.site.urls),
+    url(r'^webansi/', include('webansi.urls')),
+]
+2、编写视图函数
+# webansi/views.py
+from django.shortcuts import render, HttpResponse
+
+def index(request):
+    return HttpResponse('<h1>Success</h1>')
+3、启动django项目
+(djenv) [root@room8pc16 myansible]# python manage.py runserver 0:80
+4、修改函数，返回模板文件
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'index.html')
+5、编写模板文件
+(1) 创建模板目录
+(djenv) [root@room8pc16 myansible]# mkdir webansi/templates
+(2) 拷贝boostrap的static目录到webansi目录下
+(3) 编写index.html的基础信息
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        .banner{
+            background-image: url({% static 'imgs/banner.png' %});
+            height: 100px;
+            background-size: 100%;
+        }
+        .footer{
+            height: 100px;
+            line-height: 100px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="banner"></div>
+    <div class="main">
+        aa bb cc dd
+    </div>
+    <div class="footer text-center h4">
+        <a href="http://linux.tedu.cn">达内云计算学院</a> 客服电话：400-111-8989 邮箱：admin@tedu.cn
+    </div>
+</div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>
+6、引入模板继承
+(1) 把index.html复制一份，起名为base.html
+(2) 去除base.html中个性化的部分，结果如下：
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        .banner{
+            background-image: url({% static 'imgs/banner.png' %});
+            height: 100px;
+            background-size: 100%;
+        }
+        .footer{
+            height: 100px;
+            line-height: 100px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="banner"></div>
+    <div class="main">
+        {% block content %}{% endblock %}
+    </div>
+    <div class="footer text-center h4">
+        <a href="http://linux.tedu.cn">达内云计算学院</a> 客服电话：400-111-8989 邮箱：admin@tedu.cn
+    </div>
+</div>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>
+(3) index.html继承模板
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}首页{% endblock %}
+{% block content %}
+    <div class="row text-center h4">
+        <div class="col-md-3">
+            <a href="#">
+                <img width="150px" src="{% static 'imgs/linux.jpg' %}"><br>
+                主机信息
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="#">
+                <img width="150px" src="{% static 'imgs/linux.jpg' %}"><br>
+                添加主机
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="#">
+                <img width="150px" src="{% static 'imgs/linux.jpg' %}"><br>
+                添加模块
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="#">
+                <img width="150px" src="{% static 'imgs/linux.jpg' %}"><br>
+                执行任务
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+八、将模型注册到后台
+1、注册
+# webansi/admin.py
+from django.contrib import admin
+from .models import HostGroup, Host, Module, Argument
+
+for item in [HostGroup, Host, Module, Argument]:
+    admin.site.register(item)
+2、创建超级用户
+(djenv) [root@room8pc16 myansible]# python manage.py createsuperuser
+3、在后台管理界面，创建主机组和主机
+
+九、配置ansible
+1、在manage.py所在的目录创建工作目录
+(djenv) [root@room8pc16 myansible]# mkdir ansicfg
+(djenv) [root@room8pc16 myansible]# cd ansicfg
+2、创建配置文件
+(djenv) [root@room8pc16 ansicfg]# vim ansible.cfg
+[defaults]
+inventory = gethosts.py
+remote_user = root
+3、创建gethosts.py，使之可以在数据库中取出主机和组
+(1) 脚本执行后，打印json格式的数据，格式如下：
+{
+    "dbservers": {"hosts": ["192.168.4.3"]},
+    "webservers": {"hosts": ["192.168.4.4", "192.168.4.5"]},
+    "storage": {"hosts": ["192.168.4.1", "192.168.4.2"]},
+    "lvs": {"hosts": ["192.168.4.6"]}
+}
+(2) 编写动态主机清单脚本
+# ansicfg/gethosts.py
+#!/opt/djenv/bin/python
+
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import json
+
+engine = create_engine(
+    'sqlite:////var/ftp/nsd_2018/nsd1807/devweb/ansible_project/myansible/db.sqlite3',
+    encoding='utf8',
+)
+Session = sessionmaker(bind=engine)
+Base = declarative_base()
+
+class HostGroup(Base):
+    __tablename__ = 'webansi_hostgroup'
+    id = Column(Integer, primary_key=True)
+    groupname = Column(String(50), unique=True, nullable=False)
+
+    def __str__(self):
+        return self.groupname
+
+class Host(Base):
+    __tablename__ = 'webansi_host'
+    id = Column(Integer, primary_key=True)
+    hostname = Column(String(100), unique=True, nullable=False)
+    ipaddr = Column(String(15), nullable=False)
+    group_id = Column(Integer, ForeignKey('webansi_hostgroup.id'))
+
+    def __str__(self):
+        return '%s: %s' % (self.hostname, self.ipaddr)
+
+if __name__ == '__main__':
+    result = {}
+    session = Session()
+    query = session.query(HostGroup.groupname, Host.ipaddr)\
+        .join(Host, HostGroup.id==Host.group_id)
+    # print(list(query))
+    for group, ip in query:
+        if group not in result:
+            result[group] = {}
+            result[group]['hosts'] = []
+        result[group]['hosts'].append(ip)
+    print(json.dumps(result))
+(3) 给gethosts.py脚本增加x权限
+(djenv) [root@room8pc16 ansicfg]# chmod +x gethosts.py
+(4) 测试动态主机清单脚本
+(djenv) [root@room8pc16 ansicfg]# ./gethosts.py
+(djenv) [root@room8pc16 ansicfg]# ansible all -m ping
+
+
+九、编写主机信息页
+1、实现url
+# webansi/urls.py
+from django.conf.urls import url
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.mainpage, name='mainpage'),
+]
+2、编写函数
+# webansi/views.py
+def mainpage(request):
+    return render(request, 'mainpage.html')
+3、通过ansible-cmdb生成应用首页
+(1) 通过ansible生成所有主机信息
+(djenv) [root@room8pc16 ansicfg]# ansible all -m setup --tree out/
+(2) 生成mainpage.html
+(djenv) [root@room8pc16 ansicfg]# ansible-cmdb out/ > ../webansi/templates/mainpage.html
+如果提示有些模块没有安装上，则重新安装
+(djenv) [root@room8pc16 ansicfg]# pip install /var/ftp/pub/zzg_pypkgs/ansible-cmdb_pkgs/Mako-1.0.7.tar.gz
+4、在index.html中修改主机信息的超链接
+            <a href="{% url 'mainpage' %}">
+
+十、完成添加主机页面
+1、URL
+# webansi/views.py
+    url(r'^addhosts/$', views.addhosts, name='addhosts'),
+2、创建函数
+# webansi/views.py
+def addhosts(request):
+    groups = HostGroup.objects.all()
+    return render(request, 'addhosts.html', {'groups': groups})
+3、创建模板文件addhosts.html
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}添加主机/组{% endblock %}
+{% block content %}
+    <form action="" method="post" class="form-inline">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>主机名：</label>
+            <input type="text" class="form-control" name="hostname">
+        </div>
+        <div class="form-group">
+            <label>ip地址：</label>
+            <input type="text" class="form-control" name="ip">
+        </div>
+        <div class="form-group">
+            <label>主机组：</label>
+            <input type="text" class="form-control" name="group">
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="提 交">
+        </div>
+    </form>
+    <hr>
+    <table class="table table-bordered table-striped table-hover h4">
+        <tr class="info text-center">
+            <td>主机组</td>
+            <td>主机</td>
+        </tr>
+        {% for group in groups %}
+            <tr>
+                <td>{{ group.groupname }}</td>
+                <td>
+                    <ul class="list-unstyled">
+                        {% for host in group.host_set.all %}
+                            <li>{{ host.hostname }}: {{ host.ipaddr }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+4、在index.html中修改添加主机的超链接
+            <a href="{% url 'addhosts' %}">
+5、为了表单和上面的banner有点距离，在base.html中为main设置样式
+.main{
+    margin-top: 20px;
+}
+-------------------------第二天--------------------------------
+6、修改addhosts函数，使之可以处理表单提交来的数据
+def addhosts(request):
+    if request.method == 'POST':
+        hostname = request.POST.get('hostname')
+        ip = request.POST.get('ip')
+        group = request.POST.get('group')
+        if group:
+            # get_or_create返回元组(实例, 0/1)
+            hostgroup = HostGroup.objects.get_or_create(groupname=group)[0]
+            if hostname and ip:
+                hostgroup.host_set.get_or_create(hostname=hostname, ipaddr=ip)
+
+    groups = HostGroup.objects.all()
+    return render(request, 'addhosts.html', {'groups': groups})
+
+十一、完成添加模块页面
+1、URL
+# webansi/urls.py
+    url(r'^addmodules/$', views.addmodules, name='addmodules'),
+2、创建函数
+from .models import HostGroup, Module
+
+def addmodules(request):
+    if request.method == 'POST':
+        module = request.POST.get('module')
+        argument = request.POST.get('argument')
+        if module:
+            mod = Module.objects.get_or_create(module_name=module)[0]
+            if argument:
+                mod.argument_set.get_or_create(argument_text=argument)
+
+    modules = Module.objects.all()
+    return render(request, 'addmodules.html', {'modules': modules})
+3、创建模板文件addmodules.html
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}添加模块{% endblock %}
+{% block content %}
+    <form action="" method="post" class="form-inline">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>模块：</label>
+            <input type="text" class="form-control" name="module">
+        </div>
+        <div class="form-group">
+            <label>参数：</label>
+            <input type="text" class="form-control" name="argument">
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="提 交">
+        </div>
+    </form>
+    <hr>
+    <table class="table table-bordered table-striped table-hover h4">
+        <tr class="info text-center">
+            <td>模块</td>
+            <td>参数</td>
+        </tr>
+        {% for module in modules %}
+            <tr>
+                <td>{{ module.module_name }}</td>
+                <td>
+                    <ul class="list-unstyled">
+                        {% for arg in module.argument_set.all %}
+                            <li>{{ arg.argument_text }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+4、在index.html中修改添加模块的超链接
+            <a href="{% url 'addmodules' %}">
+
+十二、完成任务页
+1、配置URL
+# webansi/urls.py
+    url(r'^tasks/$', views.tasks, name='tasks'),
+2、在index.html中修改添加模块的超链接
+            <a href="{% url 'tasks' %}">
+3、创建函数
+from .models import HostGroup, Module, Host
+
+def tasks(request):
+    hosts = Host.objects.all()
+    groups = HostGroup.objects.all()
+    modules = Module.objects.all()
+    return render(request, 'tasks.html', {'hosts': hosts, 'groups': groups, 'modules': modules})
+4、创建模板文件tasks.html
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}执行任务{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#host" data-toggle="tab">主机</a></li>
+    <li><a href="#hostgroup" data-toggle="tab">主机组</a></li>
+</ul>
+<form action="" method="post" style="margin-top: 10px">
+    {% csrf_token %}
+    <div class="tab-content">
+        <div class="tab-pane active fade in form-group" id="host">
+            <select class="form-control" name="server">
+                <option value="">无</option>
+                {% for host in hosts %}
+                    <option value="{{ host.ipaddr }}">{{ host.hostname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="tab-pane fade form-group" id="hostgroup">
+            <select class="form-control" name="hostgroup">
+                <option value="">无</option>
+                {% for group in groups %}
+                    <option value="{{ group.groupname }}">{{ group.groupname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <table class="table table-bordered table-hover table-striped">
+        <tr class="info text-center">
+            <td>模块</td>
+            <td>参数</td>
+        </tr>
+        {% for module in modules %}
+            <tr>
+                <td>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="module" value="{{ module.module_name }}">{{ module.module_name }}
+                        </label>
+                    </div>
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        {% for arg in module.argument_set.all %}
+                            <li>
+                                <div class="radio">
+                                    <label>
+                                        <input name="argument" value="{{ arg.argument_text }}" type="radio">{{ arg.argument_text }}
+                                    </label>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="form-group">
+        <input class="btn btn-primary center-block" type="submit" value="执 行">
+    </div>
+</form>
+{% endblock %}
+
+5、修改视图，使之可以执行任务
+执行任务就是调用ansible完成，可以把devops课程的代码复制过来
+参见views.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,286 @@
+https://yiyibooks.cn/xx/Django_1.11.6/intro/tutorial01.html
+
+基于python的框架
+django：功能强大，应用广泛
+tornado：小型框架
+flask：微型框架
+
+虚拟环境：为了保持系统的整洁与易于维护环境，采用虚拟环境，虚拟环境就是一个隔离的python
+它是一个目录，激活后，安装模块都是安装到虚拟环境了。当项目结束后，清理环境只要把这个
+目录删除即可
+
+新建虚拟环境:
+1、调用python的venv模块创建虚拟环境
+[root@room8pc16 day03]# python3 -m venv /opt/djenv/
+2、激活虚拟环境
+[root@room8pc16 day03]# source /opt/djenv/bin/activate
+3、退出虚拟环境
+(djenv) [root@room8pc16 day03]# deactivate
+
+安装django
+(djenv) [root@room8pc16 zzg_pypkgs]# cd dj_pkgs/
+(djenv) [root@room8pc16 dj_pkgs]# pip install *
+(djenv) [root@room8pc16 day04]# python
+>>> import django
+>>> django.__version__
+'1.11.6'
+
+
+创建django项目
+1、创建项目
+(djenv) [root@room8pc16 day04]# django-admin startproject mysite
+(djenv) [root@room8pc16 day04]# cd mysite/
+(djenv) [root@room8pc16 mysite]# tree .
+.
+├── manage.py     #  用于管理项目（创建app，创建数据库、管理员）
+└── mysite
+    ├── __init__.py
+    ├── settings.py   # 项目的配置文件
+    ├── urls.py       # 路由系统URLConfig、程序入口
+    └── wsgi.py       # 用于部署项目到web服务器
+2、启动django自带的web服务器测试
+(djenv) [root@room8pc16 mysite]# python manage.py runserver
+
+3、配置pycharm使用虚拟环境
+file -> settings -> Project day04 -> Project Interpreter -> 点右上角的齿
+轮 -> add local -> 选择下面的existing，勾选make available ...，
+点击右侧...，在弹出的对话框中输出/opt/djenv/bin/python
+
+4、创建mysql数据库，用于存储django项目的数据
+(djenv) [root@room8pc16 ~]# mysql -uroot -ptedu.cn
+MariaDB [(none)]> create database dj1807 default charset utf8;
+
+5、修改django配置setting.py
+ALLOWED_HOSTS = '*'   # 允许所有的客户端访问
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dj1807',
+        'USER': 'root',
+        'PASSWORD': 'tedu.cn',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
+LANGUAGE_CODE = 'zh-hans'
+TIME_ZONE = 'Asia/Shanghai'
+USE_TZ = False
+
+6、配置django使用pymysql模块mysite/__init__.py
+import pymysql
+pymysql.install_as_MySQLdb()
+
+7、启动测试服务器运行在所有地址的80端口
+(djenv) [root@room8pc16 mysite]# python manage.py runserver 0:80
+
+8、生成django缺省的数据库表
+(djenv) [root@room8pc16 mysite]# python manage.py makemigrations
+(djenv) [root@room8pc16 mysite]# python manage.py migrate
+
+9、创建管理员帐号，密码必须8位以上，复杂
+(djenv) [root@room8pc16 mysite]# python manage.py createsuperuser
+
+10、访问后台http://127.0.0.1/admin
+
+一个项目最好分成N多个应用，可以把不同的应用分派给不同的程序员编写
+编写投票应用APP：
+1、数据
+两张表：
+question -> 记录问题
+choice -> 记录每个问题的选项，以及该选项所得的票数
+2、URL：所有的投票应用，网址都以http://127.0.0.1/polls/开头
+http://127.0.0.1/polls/   -> 投票首页，列出所有的问题
+http://127.0.0.1/polls/1/   -> 1号问题的详情页
+http://127.0.0.1/polls/1/result/  -> 1号问题投票的结果页
+3、创建应用
+(djenv) [root@room8pc16 mysite]# python manage.py startapp polls
+4、将创建的应用注册到项目中，修改mysite/settings.py
+INSTALLED_APPS = [
+    ... ...
+    'polls',
+]
+5、授权。将以http://127.0.0.1/polls/开头的URL都交给polls应用处理
+修改mysite/urls.py
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^polls/', include('polls.urls')),
+]
+6、在polls应用下创建urls.py
+from django.conf.urls import url
+
+urlpatterns = [
+]
+
+
+创建投票首页
+1、创建URL，指定使用哪个视图函数进行处理
+# polls/urls.py
+from django.conf.urls import url
+from . import views    # 使用相对导入的方式，在当前包中导入views模块
+
+# 在http://x.x.x.x/polls/后面开始匹配
+urlpatterns = [
+    # 首页用views.index函数处理，为这个URL起个名字叫index
+    url(r'^$', views.index, name='index'),
+]
+2、编写视图函数
+# polls/views.py
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'index.html')
+
+3、创建模板(HTML网页)
+(1) 创建polls/templates/目录
+(djenv) [root@room8pc16 mysite]# mkdir polls/templates
+(2) 在模板目录中创建网页
+# polls/templates/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票首页</title>
+</head>
+<body>
+<h1>投票首页</h1>
+<hr>
+<ul>
+    <li>投票问题1</li>
+    <li>投票问题2</li>
+</ul>
+</body>
+</html>
+4、访问http://127.0.0.1/polls/
+
+
+创建投票详情页
+1、配置URL
+# polls/urls.py
+urlpatterns = [
+    ... ...
+    url(r'^\d+/$', views.detail, name='detail'),
+]
+2、编写视图函数
+# polls/views.py
+def detail(request):
+    return render(request, 'detail.html')
+3、编写模板文件
+# polls/templates/detail.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票详情页</title>
+</head>
+<body>
+<h1>投票详情</h1>
+<hr>
+这是投票详情页
+</body>
+</html>
+4、访问http://127.0.0.1/polls/数字
+
+
+完善投票详情页
+1、修改URL，把问题编号作为参数传递给函数
+# polls/urls.py
+    url(r'^(?P<question_id>\d+)/$', views.detail, name='detail'),
+2、修改视图函数，函数接受参数，并将参数传递给模板
+# polls/views.py
+def detail(request, question_id):
+    return render(request, 'detail.html', {'question_id': question_id})
+3、修改模板文件
+# polls/templates/detail.html
+<body>
+<h1>投票详情</h1>
+<hr>
+这是第{{ question_id }}号问题的投票详情页
+</body>
+
+
+结果页
+1、URL
+    url(r'^(?P<question_id>\d+)/result/$', views.result, name='result'),
+2、views
+def result(request, question_id):
+    return render(request, 'result.html', {'question_id': question_id})
+3、result.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>投票结果页</title>
+</head>
+<body>
+<h1>投票结果</h1>
+<hr>
+这是第{{ question_id }}号问题的投票结果。
+</body>
+</html>
+
+创建模型Model
+1、创建模型
+# polls/models.py
+from django.db import models
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=100)
+    pub_date = models.DateTimeField()
+
+    def __str__(self):
+        return self.question_text
+
+class Choice(models.Model):
+    choice_text = models.CharField(max_length=100)
+    votes = models.IntegerField(default=0)
+    q = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s: %s" % (self.choice_text, self.q)
+
+2、生成数据库中的表
+(djenv) [root@room8pc16 mysite]# python manage.py makemigrations
+(djenv) [root@room8pc16 mysite]# python manage.py migrate
+MariaDB [dj1807]> show tables;
+MariaDB [dj1807]> desc polls_question;
+MariaDB [dj1807]> desc polls_choice;
+数据库中的表名，结构是：应用名_类名
+每张表都会自动生成名为id的主建字段。每个类变量成为表中的一个字段。
+外键字段的名字是：类变量_id
+
+3、修改外键名字
+class Choice(models.Model):
+    choice_text = models.CharField(max_length=100)
+    votes = models.IntegerField(default=0)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "%s: %s" % (self.choice_text, self.question)
+(djenv) [root@room8pc16 mysite]# python manage.py makemigrations
+(djenv) [root@room8pc16 mysite]# python manage.py migrate
+MariaDB [dj1807]> desc polls_choice;
+
+
+将模型注册到后台管理界面
+1、修改polls/admin.py
+from django.contrib import admin
+from .models import Question, Choice
+
+admin.site.register(Question)
+admin.site.register(Choice)
+2、在后台界面查看
+
+
+
+
+
+
+
+
+
+
+
+
