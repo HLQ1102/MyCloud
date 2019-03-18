@@ -1,0 +1,70 @@
+1、 停止所有服务  hadoop  zk  kafka
+2、 准备一台新的  nn02 （namenode） 
+    安装  openjdk-devel
+    禁用  selinux
+    卸载  firewalld
+    copy  nn01  /usr/local/hadoop
+3、 删除所有 /var/hadoop/ 数据
+4、 ssh 免密码登录 (nn02)
+5、 /etc/hosts 所有机器，加入 nn02
+
+#-----------------------------------#
+配置 /usr/local/hadoop/etc/hadoop/
+hadoop-env.sh
+slaves
+core-site.xml
+hdfs-site.xml
+mapred-site.xml
+yarn-site.xml
+
+#-----------------------------------#
+初始化启动集群
+ALL: 所有机器
+nodeX： node1    node2    node3
+NN1: nn01
+NN2: nn02
+#-----------------------------------#
+ALL:  同步配置到所有集群机器
+
+nodeX: 启动 zookeeper
+
+NN1: 初始化ZK集群  ./bin/hdfs zkfc -formatZK
+
+nodeX:  启动 journalnode 服务 
+        ./sbin/hadoop-daemon.sh start journalnode
+
+NN1: 格式化  ./bin/hdfs  namenode  -format
+
+NN2: 数据同步到本地 /var/hadoop/dfs
+
+NN1: 初始化 JNS
+        ./bin/hdfs namenode -initializeSharedEdits
+
+nodeX: 停止 journalnode 服务
+        ./sbin/hadoop-daemon.sh stop journalnode
+
+#---------------------------------#
+启动集群
+NN1: ./sbin/start-all.sh
+NN2: ./sbin/yarn-daemon.sh start resourcemanager
+
+查看集群状态
+./bin/hdfs haadmin -getServiceState nn1              ./bin/hdfs haadmin -getServiceState nn2
+./bin/yarn rmadmin -getServiceState rm1
+./bin/yarn rmadmin -getServiceState rm2
+
+./bin/hdfs dfsadmin -report
+./bin/yarn  node  -list
+
+访问集群：
+./bin/hadoop  fs -ls  /
+./bin/hadoop  fs -mkdir hdfs://nsd1806/input
+
+验证高可用，关闭 active namenode
+./sbin/hadoop-daemon.sh stop namenode
+./sbin/yarn-daemon.sh stop resourcemanager
+
+恢复节点
+./sbin/hadoop-daemon.sh stop namenode
+./sbin/yarn-daemon.sh stop resourcemanager
+
